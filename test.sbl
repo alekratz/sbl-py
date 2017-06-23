@@ -1,0 +1,40 @@
+# Example program
+# factorial
+
+fact {
+    # peek and compare to zero
+    br {
+        . x ;     # pop into x
+        1 x - ;   # push a copy and subtract 1 from it
+        fact ;    # call factorial
+        x * ;     # multiply whatever our factorial is by x
+    }
+    el {
+        # pop off to nothing, and push a 1
+        .;
+        1;
+    }
+}
+
+square {
+    dup *;
+}
+
+dup {
+    . x;
+    x x;
+}
+
+main {
+    1 fact print;
+    2 fact print;
+    3 fact print;
+    4 fact print;
+    5 fact print;
+
+    1 square print;
+    2 square print;
+    3 square print;
+    4 square print;
+    5 square print;
+}
