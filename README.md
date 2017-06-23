@@ -1,8 +1,10 @@
 # SBL - Stack Based Language
 Original name, right?
 
-# Features
+# Grammar
+You can check out the grammar in [GRAMMAR.md](GRAMMAR.md).
 
+# Features
 * Terse syntax
 * Branches
 * Stacks (duh)
@@ -13,7 +15,6 @@ Original name, right?
 * More to come...
 
 # Non-features
-
 Or, "room for improvement"
 
 * Lightning-fast virtual machine and compiler implemented in Python
@@ -22,3 +23,8 @@ Or, "room for improvement"
 * No loops - recursion only baybeeeeeeeee
 * No imports
 
+# License
+**While this project is open source, it is not free software**, for the time being. You must ask permission before
+copying and distributing the source code.
+
+It will become free software in the future, once the dust has settled.

@@ -1,19 +1,17 @@
 #!/usr/bin/env python3
 # A stack-based language written during internet downtime for funsies
 
-from common import *
-from parse import *
 from vm import *
-
 from argparse import ArgumentParser
-
-import sys
 
 # TODO
 # * Prettier errors (including source text)
+# * Move all syntax stuff (token.py, parser.py, et al) to `syntax` package
 # * Merging together SBL files' compiled bytecode
+# * Either that or imports
 # * Loops
 # * Types outside of numbers
+# * Labels + goto?
 # * ???
 
 def parse_args():
@@ -47,4 +45,3 @@ if __name__ == "__main__":
             print("call stack:")
             for f in e.call_stack:
                 print(f"{' ' * 4}{f.name} (defined at {f.fun.meta['file']}:{f.fun.meta['where']}) called from {f.callsite}")
-

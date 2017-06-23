@@ -3,30 +3,6 @@ from typing import *
 from common import *
 from copy import copy
 
-"""
-# Stack-based language grammar
-
-source = fundef*
-
-fundef = <ident> block
-
-block = '{' line* '}'
-
-line = action ';'
-     | branch
-
-action = '.' ident*
-       | item*
-
-branch = <br> block
-       | <br> block <el> block
-
-item = <ident>
-     | <num>
-     | <sym>
-
-"""
-
 
 class Item:
     def __init__(self, rng, val):

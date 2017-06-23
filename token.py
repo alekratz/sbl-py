@@ -5,33 +5,6 @@ from copy import copy
 from common import *
 
 
-"""
-# Available tokens
-comment = '#' .+ $
-
-num = [1-9][0-9]*
-    | '0' [xX] [0-9a-fA-F]+
-    | '0' [bB] [01]+
-
-ident = [A-z_][A-z\-_]*
-
-dot = '.'
-
-br = 'br'
-
-el = 'el'
-
-semi = ';'
-
-lbrace = '{'
-
-rbrace = '}'
-
-sym = '!' | '@' | '$' | '%' | '^' | '&' | '*' | '-' | '+' | '/'
-
-"""
-
-
 syms = "!@$%^&*-+/"
 
 
