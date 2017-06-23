@@ -9,6 +9,7 @@ Original name, right?
 * Recursive functions
 * Order-agnostic function definition
 * Simple, LL(0) grammar (not regular, but close)
+* Built-in function support
 * More to come...
 
 # Non-features
@@ -16,6 +17,8 @@ Original name, right?
 Or, "room for improvement"
 
 * Lightning-fast virtual machine and compiler implemented in Python
-* No compiled bytecode
+* No savable bytecode
 * Integers only
+* No loops - recursion only baybeeeeeeeee
 * No imports
+
