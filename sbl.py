@@ -9,10 +9,11 @@ from argparse import ArgumentParser
 
 import sys
 
-#
 # TODO
 # * Prettier errors (including source text)
 # * Merging together SBL files' compiled bytecode
+# * Loops
+# * Types outside of numbers
 # * ???
 
 def parse_args():

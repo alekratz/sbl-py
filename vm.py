@@ -1,6 +1,5 @@
 from compile import *
 from parse import *
-from typing import *
 from funs import BUILTINS
 
 
@@ -49,9 +48,6 @@ class FunState:
         return self.locals[name]
 
 
-"""
-Virtual machine class.
-"""
 class VM:
     def __init__(self, funs, builtins=BUILTINS):
         self.funs = funs
@@ -76,36 +72,36 @@ class VM:
             pc = fun_state.pc
             bc = fun.bc[pc]
             if bc.code == BC.PUSH:
-                #print(f"PUSH {bc.payload}")
+                # print(f"PUSH {bc.payload}")
                 self.state.push(bc.payload)
                 fun_state.pc += 1
             elif bc.code == BC.POP:
                 item = self.state.pop()
                 if bc.payload is not None:
-                    #print(f"POP {bc.payload} [= {item}]")
+                    # print(f"POP {bc.payload} [= {item}]")
                     self.state.store(bc.payload, item)
-                #else:
-                    #print(f"POP")
+                # else:
+                    # print(f"POP")
                 fun_state.pc += 1
             elif bc.code == BC.JMPZ:
                 tos = self.state.stack[-1]
                 if tos == 0:
-                    #print(f"JUMP {bc.payload}")
+                    # print(f"JUMP {bc.payload}")
                     fun_state.pc = bc.payload
                 else:
                     fun_state.pc += 1
             elif bc.code == BC.JMP:
-                #print(f"JUMP {bc.payload}")
+                # print(f"JUMP {bc.payload}")
                 fun_state.pc = bc.payload
             elif bc.code == BC.CALL:
-                #print(f"CALL {bc.payload} {self.state.stack}")
+                # print(f"CALL {bc.payload} {self.state.stack}")
                 self._call(bc.payload, f"`{fun_state.name}` at {bc.meta['file']}:{bc.meta['where']}")
                 fun_state.pc += 1
             elif bc.code == BC.RET:
-                #print("RET")
+                # print("RET")
                 break
             elif bc.code == BC.LOAD:
-                #print(f"LOAD {bc.payload}")
+                # print(f"LOAD {bc.payload}")
                 val = self.state.load(bc.payload)
                 self.state.push(val)
                 fun_state.pc += 1

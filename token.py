@@ -47,9 +47,9 @@ class Token:
     RBRACE = 8
     SYM = 9
 
-    def __init__(self, type: int, range: Range, payload: Any=None):
-        self.type = type
-        self.range = range
+    def __init__(self, ty: int, rng: Range, payload: Any=None):
+        self.type = ty
+        self.range = rng
         self.payload = payload
 
     def is_comment(self) -> bool:
@@ -58,25 +58,32 @@ class Token:
     @staticmethod
     def comment(rng: Range):
         return Token(Token.COMMENT, rng)
-    
+
+    @staticmethod
     def dot(rng: Range):
         return Token(Token.DOT, rng)
 
+    @staticmethod
     def semi(rng: Range):
         return Token(Token.SEMI, rng)
 
+    @staticmethod
     def lbrace(rng: Range):
         return Token(Token.LBRACE, rng)
 
+    @staticmethod
     def rbrace(rng: Range):
         return Token(Token.RBRACE, rng)
 
+    @staticmethod
     def num(rng: Range, num: int):
         return Token(Token.NUM, rng, num)
 
+    @staticmethod
     def ident(rng: Range, ident: str):
         return Token(Token.IDENT, rng, ident)
-    
+
+    @staticmethod
     def sym(rng: Range, sym: str):
         return Token(Token.SYM, rng, sym)
 
@@ -87,7 +94,7 @@ class Token:
         return name
 
     @staticmethod
-    def type_str(type: int):
+    def type_str(ty: int):
         name_map = {
             Token.COMMENT: "Comment",
             Token.NUM: "Num",
@@ -100,8 +107,9 @@ class Token:
             Token.RBRACE: "RBrace",
             Token.SYM: "Sym",
         }
-        assert type in name_map
-        return name_map[type]
+        assert ty in name_map
+        return name_map[ty]
+
 
 class Tokenizer:
     def __init__(self, source: str):
@@ -148,7 +156,7 @@ class Tokenizer:
             start = end = copy(self.pos)
             self._adv()
             return Token.rbrace(Range(start, end))
-        elif self.curr_ch == '0' and self.next_chr in 'xX':
+        elif self.curr_ch == '0' and self.next_ch in 'xX':
             # hex num
             start = copy(self.pos)
             end = copy(self.pos)
@@ -161,9 +169,9 @@ class Tokenizer:
             while self.curr_ch in string.hexdigits:
                 end = copy(self.pos)
                 self._adv()
-            num = int(self.source[self.range.start.idx : self.range.end.idx + 1], 16)
+            num = int(self.source[start.idx:end.idx + 1], 16)
             return Token.num(Range(start, end), num)
-        elif self.curr_ch == '0' and self.next_chr in 'bB':
+        elif self.curr_ch == '0' and self.next_ch in 'bB':
             # binary num
             start = copy(self.pos)
             end = copy(self.pos)
@@ -176,7 +184,7 @@ class Tokenizer:
             while self.curr_ch in "01":
                 end = copy(self.pos)
                 self._adv()
-            num = int(self.source[start.idx : end.idx + 1], 2)
+            num = int(self.source[start.idx:end.idx + 1], 2)
             return Token.num(Range(start, end), num)
         elif self.curr_ch in string.digits:
             # num
@@ -186,7 +194,7 @@ class Tokenizer:
             while self.curr_ch in string.digits:
                 end = copy(self.pos)
                 self._adv()
-            num = int(self.source[start.idx : end.idx + 1])
+            num = int(self.source[start.idx:end.idx + 1])
             return Token.num(Range(start, end), num)
         elif self.curr_ch in string.ascii_letters:
             keywords = {
@@ -200,7 +208,7 @@ class Tokenizer:
             while self.curr_ch in string.ascii_letters:
                 end = copy(self.pos)
                 self._adv()
-            ident = self.source[start.idx : end.idx + 1]
+            ident = self.source[start.idx:end.idx + 1]
             # choose keyword
             if ident in keywords:
                 return Token(keywords[ident], Range(start, end))
@@ -208,12 +216,12 @@ class Tokenizer:
                 return Token.ident(Range(start, end), ident)
         elif self.curr_ch in syms:
             start = copy(self.pos)
-            end = copy(self.src_pos)
+            end = copy(self.pos)
             self._adv()
             while self.curr_ch in syms:
                 end = copy(self.pos)
                 self._adv()
-            sym = self.source[start.idx : end.idx]
+            sym = self.source[start.idx:end.idx + 1]
             return Token.sym(Range(start, end), sym)
         else:
             raise ParseError(f"unexpected character reached: {repr(self.curr_ch)}", self.pos)
@@ -240,7 +248,7 @@ class Tokenizer:
                 # check the *previous* character
                 if self.curr_ch == '\n':
                     self.src_pos.adv_line()
-        #print(f"chars: {repr(self.curr_ch)}, {repr(self.next_ch)}")
+        # print(f"chars: {repr(self.curr_ch)}, {repr(self.next_ch)}")
     
     """
     Skips whitespace in the source text

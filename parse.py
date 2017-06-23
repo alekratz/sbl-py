@@ -27,19 +27,22 @@ item = <ident>
 
 """
 
+
 class Item:
-    def __init__(self, range, val):
-        self.range = range
+    def __init__(self, rng, val):
+        self.range = rng
         self.val = val
 
     def __repr__(self):
         return repr(self.val)
 
+
 class Action:
-    def __init__(self, range, items, pop=False):
-        self.range = range
+    def __init__(self, rng, items, pop=False):
+        self.range = rng
         self.items = items
         self.pop = pop
+
 
 class Branch:
     """
@@ -48,16 +51,17 @@ class Branch:
     :br: the list of lines held by the br block.
     :el: the list of lines held by the el block.
     """
-    def __init__(self, range, br_block, el_block):
-        self.range = range
+    def __init__(self, rng, br_block, el_block):
+        self.range = rng
         self.br_block = br_block
         self.el_block = el_block
 
 Line = Union[Action, Branch]
 
+
 class Block:
-    def __init__(self, range, lines: List[Line]):
-        self.range = range
+    def __init__(self, rng, lines: List[Line]):
+        self.range = rng
         self.lines = lines
 
     def __iter__(self):
@@ -66,8 +70,8 @@ class Block:
 
 
 class FunDef:
-    def __init__(self, range, name: str, block: Block):
-        self.range = range
+    def __init__(self, rng, name: str, block: Block):
+        self.range = rng
         self.name = name
         self.block = block
 
@@ -118,7 +122,8 @@ class Parser:
             return self._expect_branch()
         else:
             types = [Token.IDENT, Token.NUM, Token.SYM, Token.BR, Token.DOT]
-            raise ParseError(f"expected one of {', '.join(['`' + Token.type_str(t) + '`' for t in types])} token; instead got `{self.curr}` token", self.curr.range)
+            raise ParseError(f"expected one of {', '.join(['`' + Token.type_str(t) + '`' for t in types])} token; "
+                             f"instead got `{self.curr}` token", self.curr.range)
 
     def _expect_action(self) -> Action:
         start = copy(self.curr.range.start)
@@ -128,7 +133,8 @@ class Parser:
         while not self._try_expect(Token.SEMI):
             item = self._expect_item()
             if pop and type(item.val) is not str:
-                raise ParseError(f"pop actions only accept identifiers, where a non-identifier (`{item}`) was found", item.range)
+                raise ParseError(f"pop actions only accept identifiers, where a non-identifier (`{item}`) was found",
+                                 item.range)
             end = copy(self.curr.range.start)
             items += [item]
         return Action(Range(start, end), items, pop)
@@ -158,8 +164,8 @@ class Parser:
         else:
             return False
 
-    def _try_expect(self, type: int) -> bool:
-        if self._can_expect(type):
+    def _try_expect(self, ty: int) -> bool:
+        if self._can_expect(ty):
             self._next()
             return True
         else:
@@ -168,20 +174,21 @@ class Parser:
     def _can_expect_any(self, types: List[int]) -> bool:
         return self.curr.type in types
 
-    def _can_expect(self, type: int) -> bool:
-        return self.curr.type == type
+    def _can_expect(self, ty: int) -> bool:
+        return self.curr.type == ty
 
     def _next_expect_any(self, types: List[int]):
         if self.curr.type in types:
             return self._next()
         else:
-            raise ParseError(f"expected one of {', '.join(['`' + Token.type_str(t) + '`' for t in types])} token; instead got `{self.curr}` token", self.curr.range)
+            raise ParseError(f"expected one of {', '.join(['`' + Token.type_str(t) + '`' for t in types])} token; "
+                             f"instead got `{self.curr}` token", self.curr.range)
 
-    def _next_expect(self, type: int):
-        if self.curr.type == type:
+    def _next_expect(self, ty: int):
+        if self.curr.type == ty:
             return self._next()
         else:
-            raise ParseError(f"expected `{Token.type_str(type)}` token; instead got `{self.curr}` token", self.curr.range)
+            raise ParseError(f"expected `{Token.type_str(ty)}` token; instead got `{self.curr}` token", self.curr.range)
 
     def _next(self):
         """

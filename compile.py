@@ -3,9 +3,7 @@ from typing import *
 from common import *
 from funs import BUILTINS
 
-"""
-Bytecode class.
-"""
+
 class BC:
     # Pushes the payload item to the stack.
     PUSH = 0
@@ -22,7 +20,9 @@ class BC:
     # Returns from a function.
     RET = 6
 
-    def __init__(self, code: int, meta={}, payload=None):
+    def __init__(self, code: int, meta=None, payload=None):
+        if meta is None:
+            meta = {}
         self.code = code
         self.payload = payload
         self.meta = meta
@@ -72,13 +72,18 @@ class BC:
 
 
 class Fun:
-    def __init__(self, name, bc, meta={}):
+    def __init__(self, name, bc, meta=None):
+        if meta is None:
+            meta = {}
         self.name = name
         self.bc = bc
         self.meta = meta
 
+
 class Compiler:
-    def __init__(self, ast, meta={}):
+    def __init__(self, ast, meta=None):
+        if meta is None:
+            meta = {}
         self.ast = ast
         self.fun_names = []
         self.builtins = BUILTINS
@@ -110,7 +115,8 @@ class Compiler:
         for fun in self.ast:
             assert type(fun) is FunDef
             if fun.name in self.fun_names:
-                raise CompileError(f"function `{fun.name}` defined twice (first definition at {funs[fun.name].range.start})", fun.range)
+                raise CompileError(f"function `{fun.name}` defined twice (first definition at "
+                                   f"{funs[fun.name].range.start})", fun.range)
             self.fun_names += [fun.name]
             funs[fun.name] = fun
 
@@ -144,7 +150,7 @@ class Compiler:
                         else:
                             bc += [BC.push(self._meta_with(where=item.range), item.val)]
             elif type(line) is Branch:
-                start_addr = len(bc) + jmp_offset # this is where we insert the first jump, later
+                start_addr = len(bc) + jmp_offset  # this is where we insert the first jump, later
                 bc += [None]
                 bc += self._compile_block(line.br_block, len(bc))
                 if line.el_block:
@@ -155,9 +161,7 @@ class Compiler:
                     bc[end_addr] = BC.jmp(self._meta_with(where=line.el_block.range), len(bc) + jmp_offset)
                 else:
                     end_addr = len(bc) + jmp_offset
-                    bc[start_addr] = BC.jmpz(self._meta_with(line.br_block.range), end_addr)
+                    bc[start_addr] = BC.jmpz(self._meta_with(where=line.br_block.range), end_addr)
             else:
                 assert False, f"line was neither an action nor a branch: {line}"
         return bc
-
-

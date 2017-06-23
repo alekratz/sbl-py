@@ -44,4 +44,3 @@ class VMError(Exception):
 class CompileError(Exception):
     def __init__(self, msg, pos):
         super(CompileError, self).__init__(f"at {pos}: {msg}")
-
