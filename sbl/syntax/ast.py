@@ -1,17 +1,45 @@
+from sbl.common import *
 from typing import *
+from enum import *
 
 
-class Item:
-    def __init__(self, rng, val):
-        self.range = rng
+class ItemType(Enum):
+    INT = 'integer'
+    IDENT = "identifier"
+    CHAR = 'character'
+    STRING = 'string'
+
+ValType = ItemType
+
+class Val:
+    def __init__(self, val, ty: ValType):
         self.val = val
+        self.type = ty
+
+    def __str__(self):
+        return self.val
 
     def __repr__(self):
-        return repr(self.val)
+        return f"Val({self.type} `{repr(self.val)}`"
+
+class Item:
+    def __init__(self, rng: Range, val, ty: ItemType):
+        self.range = rng
+        self.val = val
+        self.type = ty
+
+    def to_val(self) -> Val:
+        return Val(self.val, self.type)
+
+    def __str__(self):
+        return f"{self.type.value} ({repr(self.val)})"
+
+    def __repr__(self):
+        return f"Item({self}))"
 
 
 class Action:
-    def __init__(self, rng, items, pop=False):
+    def __init__(self, rng: Range, items, pop=False):
         self.range = rng
         self.items = items
         self.pop = pop

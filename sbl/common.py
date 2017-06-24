@@ -46,3 +46,7 @@ class CompileError(Exception):
     def __init__(self, msg: str, rng: Range):
         super().__init__(f"at {rng}: {msg}")
         self.range = rng
+
+class FunError(Exception):
+    def __init__(self, msg: str):
+        super().__init__(msg)

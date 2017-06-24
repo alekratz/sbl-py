@@ -6,19 +6,30 @@ from enum import *
 from sbl.common import *
 
 syms = "!@$%^&*-+/"
-
+escape_map = {
+    'n': '\n',
+    't': '\t',
+    'r': '\r',
+    '0': '\0',
+    's': ' ',
+    '"': '"',
+    "'": "'",
+}
 
 class TokenType(Enum):
     COMMENT = 'comment'
     NUM = 'integer'
+    STRING = 'string'
+    CHAR = 'character'
     IDENT = 'ident'
+    SYM = 'symbol'
     DOT = 'dot'
     BR = 'br keyword'
     EL = 'el keyword'
     SEMI = 'semicolon'
     LBRACE = 'left brace'
     RBRACE = 'right brace'
-    SYM = 'symbol'
+
 
 class Token:
     def __init__(self, ty: TokenType, rng: Range, payload: Any=None):
@@ -32,6 +43,19 @@ class Token:
     @staticmethod
     def comment(rng: Range):
         return Token(TokenType.COMMENT, rng)
+
+    @staticmethod
+    def num(rng: Range, num: int):
+        return Token(TokenType.NUM, rng, num)
+
+    @staticmethod
+    def string(rng: Range, s: str):
+        return Token(TokenType.STRING, rng, s)
+
+    @staticmethod
+    def char(rng: Range, c: str):
+        assert len(c) == 1
+        return Token(TokenType.CHAR, rng, c)
 
     @staticmethod
     def dot(rng: Range):
@@ -50,10 +74,6 @@ class Token:
         return Token(TokenType.RBRACE, rng)
 
     @staticmethod
-    def num(rng: Range, num: int):
-        return Token(TokenType.NUM, rng, num)
-
-    @staticmethod
     def ident(rng: Range, ident: str):
         return Token(TokenType.IDENT, rng, ident)
 
@@ -62,9 +82,14 @@ class Token:
         return Token(TokenType.SYM, rng, sym)
 
     def __str__(self):
+        MAX_LEN = 18
         name = self.type.value
         if self.payload is not None:
-            name += f" ({self.payload})"
+            if type(self.payload) is str and len(self.payload) > MAX_LEN:
+                content = self.payload[0:MAX_LEN] + '...'
+            else:
+                content = self.payload
+            name += f" ({repr(content)})"
         return name
 
 
@@ -120,6 +145,48 @@ class Tokenizer:
             start = end = copy(self.pos)
             self._adv()
             return Token.rbrace(Range(start, end))
+        elif self.curr_ch == '"':
+            # string
+            start = copy(self.pos)
+            self._adv()
+            end = copy(self.pos)
+            built = ''
+            while self.curr_ch != '"' and self.curr_ch is not None:
+                if self.curr_ch == '\\':
+                    self._adv()
+                    if self.curr_ch is None:
+                        raise ParseError(f'expected escape code; instead got EOF', Range(start, end))
+                    c = self.curr_ch
+                    if c not in escape_map:
+                        raise ParseError(f'unknown escape code: {repr(c)}', Range(start, end))
+                    c = escape_map[c]
+                else:
+                    c = self.curr_ch
+                built += c
+                self._adv()
+                end = copy(self.pos)
+            if self.curr_ch is None:
+                raise ParseError(f'expected string character or close quote; instead got EOF', Range(start, end))
+            assert self.curr_ch == '"'
+            self._adv()
+            return Token.string(Range(start, end), built)
+        elif self.curr_ch == "'":
+            # char
+            start = copy(self.pos)
+            self._adv()
+            end = copy(self.pos)
+            c = self.curr_ch
+            if not self._adv_expect(string.ascii_letters + string.digits + syms + '\\'):
+                raise ParseError(f'expected non-whitespace character; instead got {repr(c)}', Range(start, end))
+            if c == '\\':
+                c = self.curr_ch
+                # escapes
+                if c not in escape_map:
+                    raise ParseError(f'unknown escape code: {repr(c)}', Range(start, end))
+                c = escape_map[c]
+                end = copy(self.pos)
+                self._adv()
+            return Token.char(Range(start, end), c)
         elif self.curr_ch == '0' and self.next_ch in 'xX':
             # hex num
             start = copy(self.pos)
@@ -129,7 +196,7 @@ class Tokenizer:
             self._adv()
             # expect at least one hex char
             if not self._adv_expect(string.hexdigits):
-                raise ParseError(f"expected hex digit; instead got {self.curr_ch}", Range(start, end))
+                raise ParseError(f"expected hex digit; instead got {repr(self.curr_ch)}", Range(start, end))
             while self.curr_ch in string.hexdigits:
                 end = copy(self.pos)
                 self._adv()
@@ -144,7 +211,7 @@ class Tokenizer:
             self._adv()
             # expect at least one hex char
             if not self._adv_expect("01"):
-                raise ParseError(f"expected binary digit; instead got {self.curr_ch}", Range(start, end))
+                raise ParseError(f"expected binary digit; instead got {repr(self.curr_ch)}", Range(start, end))
             while self.curr_ch in "01":
                 end = copy(self.pos)
                 self._adv()

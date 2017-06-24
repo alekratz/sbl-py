@@ -1,79 +1,11 @@
-from enum import *
-
-from . syntax.parse import *
-from . funs import BUILTINS
-
-
-class BCType(Enum):
-    # Pushes the payload item to the stack.
-    PUSH = auto()
-    # Pops an item off the stack, into an identifier (or nothing at all).
-    POP = auto()
-    # Loads a stored value from memory and pushes its value onto the stack.
-    LOAD = auto()
-    # Jumps to a given label, given that the top item of the stack is zero.
-    JMPZ = auto()
-    # Jumps to a given label uncondiontally
-    JMP = auto()
-    # Calls a function.
-    CALL = auto()
-    # Returns from a function.
-    RET = auto()
-
-class BC:
-    def __init__(self, code: BCType, meta=None, payload=None):
-        if meta is None:
-            meta = {}
-        self.code = code
-        self.payload = payload
-        self.meta = meta
-
-    def __str__(self):
-        code_map = {
-            BCType.PUSH: "PUSH",
-            BCType.POP: "POP",
-            BCType.LOAD: "LOAD",
-            BCType.JMPZ: "JMPZ",
-            BCType.JMP: "JMP",
-            BCType.CALL: "CALL",
-            BCType.RET: "RET",
-        }
-        if self.payload:
-            return f"{code_map[self.code].ljust(6)} {self.payload}"
-        else:
-            return code_map[self.code].ljust(6)
-
-    @staticmethod
-    def push(meta, item):
-        return BC(BCType.PUSH, meta, item)
-
-    @staticmethod
-    def pop(meta, item=None):
-        return BC(BCType.POP, meta, item)
-
-    @staticmethod
-    def jmpz(meta, item):
-        return BC(BCType.JMPZ, meta, item)
-
-    @staticmethod
-    def jmp(meta, item):
-        return BC(BCType.JMP, meta, item)
-
-    @staticmethod
-    def call(meta, item):
-        return BC(BCType.CALL, meta, item)
-
-    @staticmethod
-    def ret(meta):
-        return BC(BCType.RET, meta)
-
-    @staticmethod
-    def load(meta, item):
-        return BC(BCType.LOAD, meta, item)
+from .vm.bc import *
+from .vm.funs import BUILTINS
+from .syntax.ast import ValType
+from .syntax.parse import *
 
 
 class Fun:
-    def __init__(self, name, bc, meta=None):
+    def __init__(self, name: str, bc: List[BC], meta: Mapping[str, Any]=None):
         if meta is None:
             meta = {}
         self.name = name
@@ -158,18 +90,18 @@ class Compiler:
                     # pops are allowed to not pop anything
                     if line.items:
                         for item in line.items:
-                            bc += [BC.pop(self._meta_with(where=line.range), item.val)]
+                            bc += [BC.pop(self._meta_with(where=line.range), item.to_val())]
                     else:
                         bc += [BC.pop(self._meta_with(where=line.range))]
                 else:
                     # split up the 'push' action by function names
                     for item in line.items:
                         if item.val in self.fun_names + list(self.builtins.keys()):
-                            bc += [BC.call(self._meta_with(where=line.range), item.val)]
-                        elif type(item.val) is str:
-                            bc += [BC.load(self._meta_with(where=line.range), item.val)]
+                            bc += [BC.call(self._meta_with(where=line.range), item.to_val())]
+                        elif item.type is ItemType.IDENT:
+                            bc += [BC.load(self._meta_with(where=line.range), item.to_val())]
                         else:
-                            bc += [BC.push(self._meta_with(where=item.range), item.val)]
+                            bc += [BC.push(self._meta_with(where=item.range), item.to_val())]
             elif type(line) is Branch:
                 start_addr = len(bc) + jmp_offset  # this is where we insert the first jump, later
                 bc += [None]
@@ -177,12 +109,13 @@ class Compiler:
                 if line.el_block:
                     end_addr = len(bc) + jmp_offset
                     bc += [None]
-                    bc[start_addr] = BC.jmpz(self._meta_with(where=line.br_block.range), end_addr + 1)
+                    bc[start_addr] = BC.jmpz(self._meta_with(where=line.br_block.range), Val(end_addr + 1, ValType.INT))
                     bc += self._compile_block(line.el_block, len(bc))
-                    bc[end_addr] = BC.jmp(self._meta_with(where=line.el_block.range), len(bc) + jmp_offset)
+                    bc[end_addr] = BC.jmp(self._meta_with(where=line.el_block.range), Val(len(bc) + jmp_offset,
+                                                                                          ValType.INT))
                 else:
                     end_addr = len(bc) + jmp_offset
-                    bc[start_addr] = BC.jmpz(self._meta_with(where=line.br_block.range), end_addr)
+                    bc[start_addr] = BC.jmpz(self._meta_with(where=line.br_block.range), Val(end_addr, ValType.INT))
             else:
                 assert False, f"line was neither an action nor a branch: {line}"
         return bc

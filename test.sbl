@@ -37,4 +37,7 @@ main {
     3 square print;
     4 square print;
     5 square print;
+
+    0 '\n 'o 'l 'l 'e 'h print;
+    "world!\n" print;
 }

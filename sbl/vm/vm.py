@@ -1,5 +1,6 @@
-from .compile import *
+from sbl.compile import *
 from .funs import BUILTINS
+from sbl.syntax.ast import Val, ValType
 
 
 class VMState:
@@ -7,20 +8,20 @@ class VMState:
         self.stack = []
         self.call_stack = []
 
-    def load(self, name):
+    def load(self, name: str) -> Val:
         last = self.call_stack[-1]
         if name not in last.locals:
             raise VMError(f"unknown local `{name}`", self.call_stack)
         return last.load(name)
 
-    def store(self, name, val):
+    def store(self, name: str, val: Val):
         last = self.call_stack[-1]
         last.store(name, val)
 
-    def push(self, item):
-        self.stack += [item]
+    def push(self, val: Val):
+        self.stack += [val]
 
-    def pop(self):
+    def pop(self) -> Val:
         if len(self.stack) == 0:
             raise VMError(f"attempted to pop an empty stack", self.call_stack)
         return self.stack.pop()
@@ -33,22 +34,22 @@ class VMState:
         
 
 class FunState:
-    def __init__(self, fun, callsite):
+    def __init__(self, fun: Fun, callsite):
         self.name = fun.name
         self.fun = fun
         self.locals = {}
         self.pc = 0
         self.callsite = callsite
 
-    def store(self, name, item):
-        self.locals[name] = item
+    def store(self, name: str, val: Val):
+        self.locals[name] = val
 
-    def load(self, name):
+    def load(self, name: str) -> Val:
         return self.locals[name]
 
 
 class VM:
-    def __init__(self, funs, builtins=BUILTINS):
+    def __init__(self, funs: FunTable, builtins=BUILTINS):
         self.funs = funs
         self.builtins = builtins
         self.state = VMState()
@@ -71,37 +72,44 @@ class VM:
             pc = fun_state.pc
             bc = fun.bc[pc]
             if bc.code == BCType.PUSH:
-                # print(f"PUSH {bc.payload}")
-                self.state.push(bc.payload)
+                # print(f"PUSH {bc.val}")
+                self.state.push(bc.val)
                 fun_state.pc += 1
             elif bc.code == BCType.POP:
                 item = self.state.pop()
-                if bc.payload is not None:
-                    # print(f"POP {bc.payload} [= {item}]")
-                    self.state.store(bc.payload, item)
+                if bc.val is not None:
+                    # print(f"POP {bc.val} [= {item}]")
+                    self.state.store(bc.val.val, item)
                 # else:
                     # print(f"POP")
                 fun_state.pc += 1
             elif bc.code == BCType.JMPZ:
+                assert bc.val.type is ValType.INT
                 tos = self.state.stack[-1]
-                if tos == 0:
-                    # print(f"JUMP {bc.payload}")
-                    fun_state.pc = bc.payload
+                if tos.type is not ValType.INT:
+                    raise VMError('attempted to compare top of stack to zero, but top of stack is {tos.type.val}',
+                                  self.state.call_stack)
+                if tos.val == 0:
+                    # print(f"JUMP {bc.val}")
+                    fun_state.pc = bc.val.val
                 else:
                     fun_state.pc += 1
             elif bc.code == BCType.JMP:
-                # print(f"JUMP {bc.payload}")
-                fun_state.pc = bc.payload
+                # print(f"JUMP {bc.val
+                assert bc.val.type is ValType.INT
+                fun_state.pc = bc.val.val
             elif bc.code == BCType.CALL:
-                # print(f"CALL {bc.payload} {self.state.stack}")
-                self._call(bc.payload, f"`{fun_state.name}` at {bc.meta['file']}:{bc.meta['where']}")
+                # print(f"CALL {bc.val} {self.state.stack}")
+                assert bc.val.type is ValType.IDENT
+                self._call(bc.val.val, f"`{fun_state.name}` at {bc.meta['file']}:{bc.meta['where']}")
                 fun_state.pc += 1
             elif bc.code == BCType.RET:
                 # print("RET")
                 break
             elif bc.code == BCType.LOAD:
-                # print(f"LOAD {bc.payload}")
-                val = self.state.load(bc.payload)
+                # print(f"LOAD {bc.val}")
+                assert bc.val.type is ValType.IDENT
+                val = self.state.load(bc.val.val)
                 self.state.push(val)
                 fun_state.pc += 1
         self.state.pop_fun()

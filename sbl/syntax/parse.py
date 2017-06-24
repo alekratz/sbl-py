@@ -39,12 +39,14 @@ class Parser:
         return Block(Range(start, end), lines)
 
     def _expect_line(self) -> Line:
-        if self._can_expect_any([TokenType.IDENT, TokenType.NUM, TokenType.SYM, TokenType.DOT]):
+
+        types = [TokenType.IDENT, TokenType.NUM, TokenType.CHAR, TokenType.STRING, TokenType.SYM, TokenType.DOT]
+        if self._can_expect_any(types):
             return self._expect_action()
         elif self._can_expect(TokenType.BR):
             return self._expect_branch()
         else:
-            types = [TokenType.IDENT, TokenType.NUM, TokenType.SYM, TokenType.BR, TokenType.DOT]
+            types += [TokenType.BR]
             raise ParseError(f"expected one of {', '.join(['`' + t.value + '`' for t in types])} token; "
                              f"instead got `{self.curr}` token", self.curr.range)
 
@@ -55,7 +57,7 @@ class Parser:
         items = []
         while not self._try_expect(TokenType.SEMI):
             item = self._expect_item()
-            if pop and type(item.val) is not str:
+            if pop and item.type is not ItemType.IDENT:
                 raise ParseError(f"pop actions only accept identifiers, where a non-identifier (`{item}`) was found",
                                  item.range)
             end = copy(self.curr.range.start)
@@ -74,8 +76,15 @@ class Parser:
         return Branch(Range(start, end), br_block, el_block)
 
     def _expect_item(self) -> Item:
-        item = self._next_expect_any([TokenType.NUM, TokenType.IDENT, TokenType.SYM])
-        return Item(item.range, item.payload)
+        type_map = {
+            TokenType.NUM: ItemType.INT,
+            TokenType.IDENT: ItemType.IDENT,
+            TokenType.SYM: ItemType.IDENT,
+            TokenType.STRING: ItemType.STRING,
+            TokenType.CHAR: ItemType.CHAR,
+        }
+        item = self._next_expect_any(list(type_map.keys()))
+        return Item(item.range, item.payload, type_map[item.type])
 
     def _expect_ident(self) -> str:
         return self._next_expect(TokenType.IDENT).payload

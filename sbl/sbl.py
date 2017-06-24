@@ -4,7 +4,7 @@
 import sys
 from argparse import ArgumentParser
 
-from . vm import *
+from . vm.vm import *
 
 
 # TODO
