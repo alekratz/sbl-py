@@ -26,6 +26,7 @@ class TokenType(Enum):
     DOT = 'dot'
     BR = 'br keyword'
     EL = 'el keyword'
+    LOOP = 'loop keyword'
     SEMI = 'semicolon'
     LBRACE = 'left brace'
     RBRACE = 'right brace'
@@ -231,6 +232,7 @@ class Tokenizer:
             keywords = {
                 'br': TokenType.BR,
                 'el': TokenType.EL,
+                'loop': TokenType.LOOP,
             }
             # identifier, br/el keyword
             start = copy(self.pos)

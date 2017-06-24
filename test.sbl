@@ -26,18 +26,28 @@ dup {
 }
 
 main {
-    1 fact print;
-    2 fact print;
-    3 fact print;
-    4 fact print;
-    5 fact print;
+    0;
+    1 fact;
+    2 fact;
+    3 fact;
+    4 fact;
+    5 fact;
+    loop {
+        print '\n print;
+    }
 
-    1 square print;
-    2 square print;
-    3 square print;
-    4 square print;
-    5 square print;
+    1 square;
+    2 square;
+    3 square;
+    4 square;
+    5 square;
+    loop {
+        print '\n print;
+    }
 
-    0 '\n 'o 'l 'l 'e 'h print;
+    '\n 'o 'l 'l 'e 'h;
+    loop {
+        print;
+    }
     "world!\n" print;
 }

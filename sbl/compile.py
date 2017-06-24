@@ -1,6 +1,5 @@
 from .vm.bc import *
 from .vm.funs import BUILTINS
-from .syntax.ast import ValType
 from .syntax.parse import *
 
 
@@ -105,7 +104,7 @@ class Compiler:
             elif type(line) is Branch:
                 start_addr = len(bc) + jmp_offset  # this is where we insert the first jump, later
                 bc += [None]
-                bc += self._compile_block(line.br_block, len(bc))
+                bc += self._compile_block(line.br_block, len(bc) + jmp_offset)
                 if line.el_block:
                     end_addr = len(bc) + jmp_offset
                     bc += [None]
@@ -116,6 +115,13 @@ class Compiler:
                 else:
                     end_addr = len(bc) + jmp_offset
                     bc[start_addr] = BC.jmpz(self._meta_with(where=line.br_block.range), Val(end_addr, ValType.INT))
+            elif type(line) is Loop:
+                start_addr = len(bc) + jmp_offset
+                bc += [None]
+                bc += self._compile_block(line.block, len(bc) + jmp_offset)
+                bc += [BC.jmp(self._meta_with(where=line.block.range), Val(start_addr, ValType.INT))]
+                end_addr = len(bc) + jmp_offset
+                bc[start_addr] = BC.jmpz(self._meta_with(where=line.block.range), Val(end_addr, ValType.INT))
             else:
                 assert False, f"line was neither an action nor a branch: {line}"
         return bc

@@ -45,6 +45,8 @@ class Parser:
             return self._expect_action()
         elif self._can_expect(TokenType.BR):
             return self._expect_branch()
+        elif self._can_expect(TokenType.LOOP):
+            return self._expect_loop()
         else:
             types += [TokenType.BR]
             raise ParseError(f"expected one of {', '.join(['`' + t.value + '`' for t in types])} token; "
@@ -74,6 +76,13 @@ class Parser:
             el_block = self._expect_block()
             end = el_block.range.end
         return Branch(Range(start, end), br_block, el_block)
+
+    def _expect_loop(self) -> Loop:
+        start = copy(self.curr.range.start)
+        self._next_expect(TokenType.LOOP)
+        block = self._expect_block()
+        end = block.range.end
+        return Loop(Range(start, end), block)
 
     def _expect_item(self) -> Item:
         type_map = {

@@ -57,7 +57,8 @@ class Branch:
         self.br_block = br_block
         self.el_block = el_block
 
-Line = Union[Action, Branch]
+
+Line = Union[Action, Branch, 'Loop']
 
 
 class Block:
@@ -68,6 +69,12 @@ class Block:
     def __iter__(self):
         for it in self.lines:
             yield it
+
+
+class Loop:
+    def __init__(self, rng, block: Block):
+        self.range = rng
+        self.block = block
 
 
 class FunDef:

@@ -86,10 +86,7 @@ class VM:
             elif bc.code == BCType.JMPZ:
                 assert bc.val.type is ValType.INT
                 tos = self.state.stack[-1]
-                if tos.type is not ValType.INT:
-                    raise VMError('attempted to compare top of stack to zero, but top of stack is {tos.type.val}',
-                                  self.state.call_stack)
-                if tos.val == 0:
+                if not tos.val:
                     # print(f"JUMP {bc.val}")
                     fun_state.pc = bc.val.val
                 else:

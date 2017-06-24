@@ -5,21 +5,19 @@ from sbl.syntax.ast import Val
 
 class BCType(Enum):
     # Pushes the payload item to the stack.
-    PUSH = auto()
+    PUSH = 'PUSH'
     # Pops an item off the stack, into an identifier (or nothing at all).
-    POP = auto()
+    POP = 'POP'
     # Loads a stored value from memory and pushes its value onto the stack.
-    LOAD = auto()
+    LOAD = 'LOAD'
     # Jumps to a given label, given that the top item of the stack is zero.
-    JMPZ = auto()
+    JMPZ = 'JMPZ'
     # Jumps to a given label uncondiontally
-    JMP = auto()
+    JMP = 'JMP'
     # Calls a function.
-    CALL = auto()
+    CALL = 'CALL'
     # Returns from a function.
-    RET = auto()
-
-
+    RET = 'RET'
 class BC:
     def __init__(self, code: BCType, meta=None, val: Val=None):
         if meta is None:
@@ -29,19 +27,10 @@ class BC:
         self.meta = meta
 
     def __str__(self):
-        code_map = {
-            BCType.PUSH: "PUSH",
-            BCType.POP: "POP",
-            BCType.LOAD: "LOAD",
-            BCType.JMPZ: "JMPZ",
-            BCType.JMP: "JMP",
-            BCType.CALL: "CALL",
-            BCType.RET: "RET",
-        }
         if self.val:
-            return f"{code_map[self.code].ljust(6)} {self.val}"
+            return f"{self.code.val.ljust(6)} {self.val}"
         else:
-            return code_map[self.code].ljust(6)
+            return self.code.val.ljust(6)
 
     @staticmethod
     def push(meta, val: Val) -> 'BC':
@@ -57,6 +46,10 @@ class BC:
     @staticmethod
     def jmpz(meta, val: Val) -> 'BC':
         return BC(BCType.JMPZ, meta, val)
+
+    @staticmethod
+    def jmpnz(meta, val: Val) -> 'BC':
+        return BC(BCType.JMPNZ, meta, val)
 
     @staticmethod
     def jmp(meta, val: Val) -> 'BC':
