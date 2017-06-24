@@ -3,18 +3,15 @@
 
 import sys
 from argparse import ArgumentParser
-
 from vm import *
 
 
 # TODO
-# * Prettier errors (including source text)
 # * Move all syntax stuff (token.py, parser.py, et al) to `syntax` package
-# * Either that or imports
 # * Loops
 # * Types outside of numbers
 # * Labels + goto?
-# * ???
+# * File imports
 
 def parse_args():
     parser = ArgumentParser(description="Runs SBL code.")
@@ -44,7 +41,7 @@ def underline_source(source: str, rng: Range):
         " " * offset + "^" * sz,
     ]
 
-if __name__ == "__main__":
+def main():
     args = parse_args()
     error = False
 
