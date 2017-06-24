@@ -8,7 +8,6 @@ from . vm import *
 
 
 # TODO
-# * Move all syntax stuff (token.py, parser.py, et al) to `syntax` package
 # * Loops
 # * Types outside of numbers
 # * Labels + goto?

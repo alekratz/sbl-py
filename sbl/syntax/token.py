@@ -2,7 +2,7 @@ import string
 from copy import copy
 from typing import *
 
-from . common import *
+from sbl.common import *
 
 syms = "!@$%^&*-+/"
 

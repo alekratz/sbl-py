@@ -1,7 +1,5 @@
-from . compile import *
-from . funs import BUILTINS
-
-from sbl.parse import *
+from .compile import *
+from .funs import BUILTINS
 
 
 class VMState:
