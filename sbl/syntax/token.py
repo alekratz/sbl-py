@@ -228,7 +228,7 @@ class Tokenizer:
                 self._adv()
             num = int(self.source[start.idx:end.idx + 1])
             return Token.num(Range(start, end), num)
-        elif self.curr_ch in string.ascii_letters:
+        elif self.curr_ch in string.ascii_letters + '_':
             keywords = {
                 'br': TokenType.BR,
                 'el': TokenType.EL,
@@ -238,7 +238,7 @@ class Tokenizer:
             start = copy(self.pos)
             end = copy(self.pos)
             self._adv()
-            while self.curr_ch in string.ascii_letters:
+            while self.curr_ch in string.ascii_letters + "_-":
                 end = copy(self.pos)
                 self._adv()
             ident = self.source[start.idx:end.idx + 1]

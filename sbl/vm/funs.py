@@ -39,8 +39,16 @@ def div(vm_state):
 
 def print_fn(vm_state):
     item = vm_state.pop()
-    print(item, end='')
+    print(str(item), end='')
 
+
+def println_fn(vm_state):
+    item = vm_state.pop()
+    print(f"{str(item.val)}")
+
+
+def stack_size_fn(vm_state):
+    vm_state.push(Val(len(vm_state.stack), ValType.INT))
 
 BUILTINS = {
     '+': plus,
@@ -48,4 +56,6 @@ BUILTINS = {
     '-': minus,
     '/': div,
     'print': print_fn,
+    'println': println_fn,
+    '$': stack_size_fn,
 }

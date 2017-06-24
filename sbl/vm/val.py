@@ -9,7 +9,7 @@ class Val:
         self.type = ty
 
     def __str__(self):
-        return self.val if type(self.val) is str else str(self.val)
+        return str(self.val)
 
     def __repr__(self):
         return f"Val({self.type} `{repr(self.val)}`"

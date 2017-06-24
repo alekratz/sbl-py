@@ -34,6 +34,8 @@ You can check out the grammar in [GRAMMAR.md](GRAMMAR.md).
 * Order-agnostic function definition
 * Simple, LL(0) grammar (not regular, but close)
 * Built-in function support
+* Loops
+* A handful of primitive types
 * More to come...
 
 # Non-features
@@ -41,9 +43,8 @@ Or, "room for improvement"
 
 * Lightning-fast virtual machine and compiler implemented in Python
 * No savable bytecode
-* Integers only
-* No loops - recursion only baybeeeeeeeee
 * No imports
+* No base or standard library
 
 # License
 **While this project is open source, it is not free software**, for the time being. You must ask permission before

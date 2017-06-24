@@ -85,6 +85,8 @@ class VM:
                 fun_state.pc += 1
             elif bc.code == BCType.JMPZ:
                 assert bc.val.type is ValType.INT
+                if len(self.state.stack) == 0:
+                    raise VMError("could not compare to empty stack", self.state.call_stack)
                 tos = self.state.stack[-1]
                 if not tos.val:
                     # print(f"JUMP {bc.val}")

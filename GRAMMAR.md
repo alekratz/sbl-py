@@ -17,6 +17,8 @@ action = '.' ident*
 branch = <br> block
        | <br> block <el> block
 
+loop = <loop> block
+
 item = <ident>
      | <num>
      | <sym>

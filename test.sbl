@@ -25,29 +25,33 @@ dup {
     x x;
 }
 
-main {
+test_numbers {
     0;
-    1 fact;
-    2 fact;
-    3 fact;
-    4 fact;
-    5 fact;
+    1 2 3 4 5;
     loop {
-        print '\n print;
+        fact print;
+        '\n print;
     }
 
-    1 square;
-    2 square;
-    3 square;
-    4 square;
-    5 square;
+    1 2 3 4 5;
     loop {
-        print '\n print;
+        square print;
+        '\n print;
     }
+    .;
+}
 
-    '\n 'o 'l 'l 'e 'h;
-    loop {
-        print;
+printa {
+    loop { print; }
+}
+
+main {
+    test_numbers;
+
+    0 '\n 'o 'l 'l 'e 'h printa;
+    "world!" println;
+    println;
+    br {
+        "The stack was not clean upon exit!" println;
     }
-    "world!\n" print;
 }
