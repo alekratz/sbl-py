@@ -1,6 +1,32 @@
 # SBL - Stack Based Language
 Original name, right?
 
+## This is what it looks like:
+```
+# Calculates n factorial (n!).
+fact {
+    # peek and compare to zero
+    br {
+        . x ;     # pop into x
+        1 x - ;   # push a copy and subtract 1 from it
+        fact ;    # call factorial
+        x * ;     # multiply whatever our factorial is by x
+        # note: the last 3 lines can be written as one line. i.e.
+        # 1 x - fact x *;
+    }
+    el {
+        # pop off to nothing, and push a 1
+        .;
+        1;
+    }
+}
+
+main {
+    0 5 4 3 2 1;
+    loop { fact println; }
+}
+```
+
 # Installing
 This project requires Python 3.6 or greater. To install on your system:
 
