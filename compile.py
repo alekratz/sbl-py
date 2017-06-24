@@ -1,7 +1,5 @@
-from parse import *
-from typing import *
-from common import *
 from funs import BUILTINS
+from parse import *
 
 
 class BC:
@@ -95,7 +93,7 @@ class FunTable(dict):
                 other_fun = other[name]
                 other_file = other_fun.meta['file'] if 'file' in other_fun.meta else 'unknown'
                 raise CompileError(f"duplicate function definition entries: `{name}` in {my_file} (this file) and "
-                                   f"{other_file} (other file)", f"{my_file}:{my_fun.meta['where']}")
+                                   f"{other_file} (other file)", my_fun.meta['where'])
             else:
                 self[name] = other[name]
 
@@ -145,8 +143,8 @@ class Compiler:
         """
         name = fundef.name
         bc = self._compile_block(fundef.block)
-        bc += [BC.ret(self._meta_with(where=fundef.range.end))]
-        return Fun(name, bc, self._meta_with(where=fundef.range.start))
+        bc += [BC.ret(self._meta_with(where=fundef.range))]
+        return Fun(name, bc, self._meta_with(where=fundef.range))
 
     def _compile_block(self, block: Block, jmp_offset=0) -> List[BC]:
         bc = []

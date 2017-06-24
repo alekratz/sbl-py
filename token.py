@@ -1,9 +1,8 @@
 import string
-from typing import *
 from copy import copy
+from typing import *
 
 from common import *
-
 
 syms = "!@$%^&*-+/"
 
@@ -138,7 +137,7 @@ class Tokenizer:
             self._adv()
             # expect at least one hex char
             if not self._adv_expect(string.hexdigits):
-                raise ParseError(f"expected hex digit; instead got {self.curr_ch}", start)
+                raise ParseError(f"expected hex digit; instead got {self.curr_ch}", Range(start, end))
             while self.curr_ch in string.hexdigits:
                 end = copy(self.pos)
                 self._adv()
@@ -153,7 +152,7 @@ class Tokenizer:
             self._adv()
             # expect at least one hex char
             if not self._adv_expect("01"):
-                raise ParseError(f"expected binary digit; instead got {self.curr_ch}", start)
+                raise ParseError(f"expected binary digit; instead got {self.curr_ch}", Range(start, end))
             while self.curr_ch in "01":
                 end = copy(self.pos)
                 self._adv()
@@ -197,7 +196,7 @@ class Tokenizer:
             sym = self.source[start.idx:end.idx + 1]
             return Token.sym(Range(start, end), sym)
         else:
-            raise ParseError(f"unexpected character reached: {repr(self.curr_ch)}", self.pos)
+            raise ParseError(f"unexpected character reached: {repr(self.curr_ch)}", Range(self.pos, self.pos))
 
     def _adv_expect(self, charset) -> bool:
         if self.curr_ch not in charset:

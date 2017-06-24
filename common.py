@@ -31,8 +31,9 @@ class Range:
 
 
 class ParseError(Exception):
-    def __init__(self, msg: str, pos: Pos):
-        super().__init__(f"at {pos}: {msg}")
+    def __init__(self, msg: str, rng: Range):
+        super().__init__(f"at {rng}: {msg}")
+        self.range = rng
 
 
 class VMError(Exception):
@@ -42,5 +43,6 @@ class VMError(Exception):
 
 
 class CompileError(Exception):
-    def __init__(self, msg, pos):
-        super().__init__(f"at {pos}: {msg}")
+    def __init__(self, msg: str, rng: Range):
+        super().__init__(f"at {rng}: {msg}")
+        self.range = rng
