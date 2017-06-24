@@ -1,90 +1,82 @@
 import string
 from copy import copy
 from typing import *
+from enum import *
 
 from sbl.common import *
 
 syms = "!@$%^&*-+/"
 
 
-class Token:
-    COMMENT = 0
-    NUM = 1
-    IDENT = 2
-    DOT = 3
-    BR = 4
-    EL = 5
-    SEMI = 6
-    LBRACE = 7
-    RBRACE = 8
-    SYM = 9
+class TokenType(Enum):
+    COMMENT = 'comment'
+    NUM = 'integer'
+    IDENT = 'ident'
+    DOT = 'dot'
+    BR = 'br keyword'
+    EL = 'el keyword'
+    SEMI = 'semicolon'
+    LBRACE = 'left brace'
+    RBRACE = 'right brace'
+    SYM = 'symbol'
 
-    def __init__(self, ty: int, rng: Range, payload: Any=None):
+class Token:
+    def __init__(self, ty: TokenType, rng: Range, payload: Any=None):
         self.type = ty
         self.range = rng
         self.payload = payload
 
     def is_comment(self) -> bool:
-        return self.type == Token.COMMENT
+        return self.type == TokenType.COMMENT
 
     @staticmethod
     def comment(rng: Range):
-        return Token(Token.COMMENT, rng)
+        return Token(TokenType.COMMENT, rng)
 
     @staticmethod
     def dot(rng: Range):
-        return Token(Token.DOT, rng)
+        return Token(TokenType.DOT, rng)
 
     @staticmethod
     def semi(rng: Range):
-        return Token(Token.SEMI, rng)
+        return Token(TokenType.SEMI, rng)
 
     @staticmethod
     def lbrace(rng: Range):
-        return Token(Token.LBRACE, rng)
+        return Token(TokenType.LBRACE, rng)
 
     @staticmethod
     def rbrace(rng: Range):
-        return Token(Token.RBRACE, rng)
+        return Token(TokenType.RBRACE, rng)
 
     @staticmethod
     def num(rng: Range, num: int):
-        return Token(Token.NUM, rng, num)
+        return Token(TokenType.NUM, rng, num)
 
     @staticmethod
     def ident(rng: Range, ident: str):
-        return Token(Token.IDENT, rng, ident)
+        return Token(TokenType.IDENT, rng, ident)
 
     @staticmethod
     def sym(rng: Range, sym: str):
-        return Token(Token.SYM, rng, sym)
+        return Token(TokenType.SYM, rng, sym)
 
     def __str__(self):
-        name = Token.type_str(self.type)
+        name = self.type.value
         if self.payload is not None:
             name += f" ({self.payload})"
         return name
 
-    @staticmethod
-    def type_str(ty: int):
-        name_map = {
-            Token.COMMENT: "Comment",
-            Token.NUM: "Num",
-            Token.IDENT: "Ident",
-            Token.DOT: "Dot",
-            Token.BR: "br",
-            Token.EL: "el",
-            Token.SEMI: "Semi",
-            Token.LBRACE: "LBrace",
-            Token.RBRACE: "RBrace",
-            Token.SYM: "Sym",
-        }
-        assert ty in name_map
-        return name_map[ty]
-
 
 class Tokenizer:
+    """
+    Turns SBL source into text.
+    """
     def __init__(self, source: str):
+        """
+        Creates a new tokenizer from source text.
+        :param source: the source text to tokenize.
+        """
         self.source = source
         # current character
         self.curr_ch = None
@@ -170,8 +162,8 @@ class Tokenizer:
             return Token.num(Range(start, end), num)
         elif self.curr_ch in string.ascii_letters:
             keywords = {
-                'br': Token.BR,
-                'el': Token.EL,
+                'br': TokenType.BR,
+                'el': TokenType.EL,
             }
             # identifier, br/el keyword
             start = copy(self.pos)

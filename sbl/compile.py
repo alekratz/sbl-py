@@ -1,24 +1,27 @@
+from enum import *
+
 from . syntax.parse import *
 from . funs import BUILTINS
 
 
-class BC:
+class BCType(Enum):
     # Pushes the payload item to the stack.
-    PUSH = 0
+    PUSH = auto()
     # Pops an item off the stack, into an identifier (or nothing at all).
-    POP = 1
+    POP = auto()
     # Loads a stored value from memory and pushes its value onto the stack.
-    LOAD = 2
+    LOAD = auto()
     # Jumps to a given label, given that the top item of the stack is zero.
-    JMPZ = 3
+    JMPZ = auto()
     # Jumps to a given label uncondiontally
-    JMP = 4
+    JMP = auto()
     # Calls a function.
-    CALL = 5
+    CALL = auto()
     # Returns from a function.
-    RET = 6
+    RET = auto()
 
-    def __init__(self, code: int, meta=None, payload=None):
+class BC:
+    def __init__(self, code: BCType, meta=None, payload=None):
         if meta is None:
             meta = {}
         self.code = code
@@ -27,13 +30,13 @@ class BC:
 
     def __str__(self):
         code_map = {
-            BC.PUSH: "PUSH",
-            BC.POP: "POP",
-            BC.LOAD: "LOAD",
-            BC.JMPZ: "JMPZ",
-            BC.JMP: "JMP",
-            BC.CALL: "CALL",
-            BC.RET: "RET",
+            BCType.PUSH: "PUSH",
+            BCType.POP: "POP",
+            BCType.LOAD: "LOAD",
+            BCType.JMPZ: "JMPZ",
+            BCType.JMP: "JMP",
+            BCType.CALL: "CALL",
+            BCType.RET: "RET",
         }
         if self.payload:
             return f"{code_map[self.code].ljust(6)} {self.payload}"
@@ -42,31 +45,31 @@ class BC:
 
     @staticmethod
     def push(meta, item):
-        return BC(BC.PUSH, meta, item)
+        return BC(BCType.PUSH, meta, item)
 
     @staticmethod
     def pop(meta, item=None):
-        return BC(BC.POP, meta, item)
+        return BC(BCType.POP, meta, item)
 
     @staticmethod
     def jmpz(meta, item):
-        return BC(BC.JMPZ, meta, item)
+        return BC(BCType.JMPZ, meta, item)
 
     @staticmethod
     def jmp(meta, item):
-        return BC(BC.JMP, meta, item)
+        return BC(BCType.JMP, meta, item)
 
     @staticmethod
     def call(meta, item):
-        return BC(BC.CALL, meta, item)
+        return BC(BCType.CALL, meta, item)
 
     @staticmethod
     def ret(meta):
-        return BC(BC.RET, meta)
+        return BC(BCType.RET, meta)
 
     @staticmethod
     def load(meta, item):
-        return BC(BC.LOAD, meta, item)
+        return BC(BCType.LOAD, meta, item)
 
 
 class Fun:
@@ -96,6 +99,7 @@ class FunTable(dict):
                                    f"{other_file} (other file)", my_fun.meta['where'])
             else:
                 self[name] = other[name]
+
 
 class Compiler:
     def __init__(self, ast, meta=None):

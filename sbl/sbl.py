@@ -29,8 +29,7 @@ def underline_source(source: str, rng: Range):
         sz = rng.end.col - rng.start.col
     else:
         sz = len(lines[rng.start.line]) - rng.start.col
-    if sz == 0:
-        sz = 1
+    sz += 1
     padded_line = lines[rng.start.line]
     line = padded_line.lstrip()
     if len(line) > MAX_LINE_LEN:

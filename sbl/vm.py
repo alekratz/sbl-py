@@ -70,11 +70,11 @@ class VM:
         while True:
             pc = fun_state.pc
             bc = fun.bc[pc]
-            if bc.code == BC.PUSH:
+            if bc.code == BCType.PUSH:
                 # print(f"PUSH {bc.payload}")
                 self.state.push(bc.payload)
                 fun_state.pc += 1
-            elif bc.code == BC.POP:
+            elif bc.code == BCType.POP:
                 item = self.state.pop()
                 if bc.payload is not None:
                     # print(f"POP {bc.payload} [= {item}]")
@@ -82,24 +82,24 @@ class VM:
                 # else:
                     # print(f"POP")
                 fun_state.pc += 1
-            elif bc.code == BC.JMPZ:
+            elif bc.code == BCType.JMPZ:
                 tos = self.state.stack[-1]
                 if tos == 0:
                     # print(f"JUMP {bc.payload}")
                     fun_state.pc = bc.payload
                 else:
                     fun_state.pc += 1
-            elif bc.code == BC.JMP:
+            elif bc.code == BCType.JMP:
                 # print(f"JUMP {bc.payload}")
                 fun_state.pc = bc.payload
-            elif bc.code == BC.CALL:
+            elif bc.code == BCType.CALL:
                 # print(f"CALL {bc.payload} {self.state.stack}")
                 self._call(bc.payload, f"`{fun_state.name}` at {bc.meta['file']}:{bc.meta['where']}")
                 fun_state.pc += 1
-            elif bc.code == BC.RET:
+            elif bc.code == BCType.RET:
                 # print("RET")
                 break
-            elif bc.code == BC.LOAD:
+            elif bc.code == BCType.LOAD:
                 # print(f"LOAD {bc.payload}")
                 val = self.state.load(bc.payload)
                 self.state.push(val)
