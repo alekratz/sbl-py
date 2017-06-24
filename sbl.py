@@ -3,11 +3,11 @@
 
 from vm import *
 from argparse import ArgumentParser
+import sys
 
 # TODO
 # * Prettier errors (including source text)
 # * Move all syntax stuff (token.py, parser.py, et al) to `syntax` package
-# * Merging together SBL files' compiled bytecode
 # * Either that or imports
 # * Loops
 # * Types outside of numbers
@@ -23,6 +23,7 @@ def parse_args():
 if __name__ == "__main__":
     args = parse_args()
 
+    fun_table = FunTable()
     for fname in args.files:
         source_name = fname
         with open(fname) as fp:
@@ -31,8 +32,7 @@ if __name__ == "__main__":
             # build the compiler parts and compile
             parser = Parser(source)
             compiler = Compiler(parser.parse(), { 'file': source_name })
-            vm = VM(compiler.compile())
-            vm.run()
+            fun_table.merge(compiler.compile())
         except ParseError as e:
             print(f"Parse error in {source_name}:")
             print(f"{' ' * 4}{e}")
@@ -45,3 +45,7 @@ if __name__ == "__main__":
             print("call stack:")
             for f in e.call_stack:
                 print(f"{' ' * 4}{f.name} (defined at {f.fun.meta['file']}:{f.fun.meta['where']}) called from {f.callsite}")
+    if len(fun_table) == 0:
+        sys.exit(0)
+    vm = VM(fun_table)
+    vm.run()

@@ -80,6 +80,25 @@ class Fun:
         self.meta = meta
 
 
+class FunTable(dict):
+    """
+    A function table, with some optional metadata.
+    """
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def merge(self, other):
+        for name in other:
+            if name in self:
+                my_fun = self[name]
+                my_file = my_fun.meta['file'] if 'file' in my_fun.meta else 'unknown'
+                other_fun = other[name]
+                other_file = other_fun.meta['file'] if 'file' in other_fun.meta else 'unknown'
+                raise CompileError(f"duplicate function definition entries: `{name}` in {my_file} (this file) and "
+                                   f"{other_file} (other file)", f"{my_file}:{my_fun.meta['where']}")
+            else:
+                self[name] = other[name]
+
 class Compiler:
     def __init__(self, ast, meta=None):
         if meta is None:
@@ -89,10 +108,10 @@ class Compiler:
         self.builtins = BUILTINS
         self.meta = meta
     
-    def compile(self) -> Mapping[str, Fun]:
+    def compile(self) -> FunTable:
         # First pass: get the names of each function
         self._build_funtable()
-        funs = {}
+        funs = FunTable()
         for fun in self.ast:
             funs[fun.name] = self._compile_fun(fun)
         return funs

@@ -32,15 +32,15 @@ class Range:
 
 class ParseError(Exception):
     def __init__(self, msg: str, pos: Pos):
-        super(ParseError, self).__init__(f"at {pos}: {msg}")
+        super().__init__(f"at {pos}: {msg}")
 
 
 class VMError(Exception):
     def __init__(self, msg, call_stack):
-        super(VMError, self).__init__(msg)
+        super().__init__(msg)
         self.call_stack = call_stack
 
 
 class CompileError(Exception):
     def __init__(self, msg, pos):
-        super(CompileError, self).__init__(f"at {pos}: {msg}")
+        super().__init__(f"at {pos}: {msg}")
