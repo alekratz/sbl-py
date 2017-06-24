@@ -1,7 +1,4 @@
-from token import *
-from typing import *
-from common import *
-from copy import copy
+from . token import *
 
 
 class Item:

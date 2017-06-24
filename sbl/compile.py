@@ -1,5 +1,6 @@
-from funs import BUILTINS
-from parse import *
+from . funs import BUILTINS
+
+from sbl.parse import *
 
 
 class BC:

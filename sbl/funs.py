@@ -1,4 +1,4 @@
-from common import *
+from sbl.common import *
 
 
 def plus(vm_state):
