@@ -62,6 +62,7 @@ You can check out the grammar in [GRAMMAR.md](GRAMMAR.md).
 * Built-in function support
 * Loops
 * A handful of primitive types
+* File path imports
 * More to come...
 
 # Non-features
@@ -69,8 +70,14 @@ Or, "room for improvement"
 
 * Lightning-fast virtual machine and compiler implemented in Python
 * No savable bytecode
-* No imports
 * No base or standard library
+* No include PATH or standard environment variable used
+
+# Release
+## 0.1.0 release planned features
+* [ ] Import path environment variable
+* [ ] License chosen
+* [ ] Unit tests
 
 # License
 **While this project is open source, it is not free software**, for the time being. You must ask permission before
