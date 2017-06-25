@@ -24,6 +24,7 @@ class TokenType(Enum):
     IDENT = 'ident'
     SYM = 'symbol'
     DOT = 'dot'
+    IMPORT = 'import keyword'
     BR = 'br keyword'
     EL = 'el keyword'
     LOOP = 'loop keyword'
@@ -233,6 +234,7 @@ class Tokenizer:
                 'br': TokenType.BR,
                 'el': TokenType.EL,
                 'loop': TokenType.LOOP,
+                'import': TokenType.IMPORT,
             }
             # identifier, br/el keyword
             start = copy(self.pos)

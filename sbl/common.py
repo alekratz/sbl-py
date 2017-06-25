@@ -47,6 +47,14 @@ class CompileError(Exception):
         super().__init__(f"at {rng}: {msg}")
         self.range = rng
 
+
 class FunError(Exception):
     def __init__(self, msg: str):
         super().__init__(msg)
+
+
+class PreprocessError(Exception):
+    def __init__(self, rng: Range, path: str):
+        super().__init__(f"error in preprocessing {path}")
+        self.rng = rng
+        self.path = path

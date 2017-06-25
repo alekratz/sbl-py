@@ -22,6 +22,7 @@ class Val:
     def __repr__(self):
         return f"Val({self.type} `{repr(self.val)}`"
 
+
 class Item:
     def __init__(self, rng: Range, val, ty: ItemType):
         self.range = rng
@@ -52,7 +53,7 @@ class Branch:
     :br: the list of lines held by the br block.
     :el: the list of lines held by the el block.
     """
-    def __init__(self, rng, br_block, el_block):
+    def __init__(self, rng: Range, br_block: 'Block', el_block: 'Block'):
         self.range = rng
         self.br_block = br_block
         self.el_block = el_block
@@ -62,7 +63,7 @@ Line = Union[Action, Branch, 'Loop']
 
 
 class Block:
-    def __init__(self, rng, lines: List[Line]):
+    def __init__(self, rng: Range, lines: List[Line]):
         self.range = rng
         self.lines = lines
 
@@ -72,16 +73,22 @@ class Block:
 
 
 class Loop:
-    def __init__(self, rng, block: Block):
+    def __init__(self, rng: Range, block: Block):
         self.range = rng
         self.block = block
 
 
 class FunDef:
-    def __init__(self, rng, name: str, block: Block):
+    def __init__(self, rng: Range, name: str, block: Block):
         self.range = rng
         self.name = name
         self.block = block
 
 
-Source = List[FunDef]
+class Import:
+    def __init__(self, rng: Range, path: str):
+        self.range = rng
+        self.path = path
+
+TopLevel = Union[FunDef, Import]
+Source = List[TopLevel]

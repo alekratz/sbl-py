@@ -17,8 +17,24 @@ class Parser:
     def _expect_source(self) -> List[FunDef]:
         funs = []
         while not self.is_end():
-            funs += [self._expect_fundef()]
+            funs += [self._expect_top_level()]
         return funs
+
+    def _expect_top_level(self) -> TopLevel:
+        if self._can_expect(TokenType.IMPORT):
+            return self._expect_import()
+        elif self._can_expect(TokenType.IDENT):
+            return self._expect_fundef()
+        else:
+            raise ParseError(f"expected fundef or import; instead got {self.curr.type.var}", self.curr.range)
+
+    def _expect_import(self) -> Import:
+        start = copy(self.curr.range.start)
+        self._next_expect(TokenType.IMPORT)
+        path = self._next_expect(TokenType.STRING)
+        end = copy(self.curr.range.end)
+        self._next_expect(TokenType.SEMI)
+        return Import(Range(start, end), path.payload)
 
     def _expect_fundef(self) -> FunDef:
         start = copy(self.curr.range.start)

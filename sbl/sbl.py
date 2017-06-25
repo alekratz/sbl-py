@@ -5,6 +5,7 @@ import sys
 from argparse import ArgumentParser
 
 from . vm.vm import *
+from . syntax.prepro import *
 
 
 # TODO
@@ -52,7 +53,10 @@ def main():
         try:
             # build the compiler parts and compile
             parser = Parser(source)
-            compiler = Compiler(parser.parse(), { 'file': source_name })
+            ast = parser.parse()
+            prepro = Preprocess(ast)
+            ast += prepro.preprocess()
+            compiler = Compiler(ast, { 'file': source_name })
             fun_table.merge(compiler.compile())
         except ParseError as e:
             print(f"Parse error in {source_name}:")

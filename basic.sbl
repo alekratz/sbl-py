@@ -1,0 +1,6 @@
+printa { loop { print; } }
+
+dup {
+    .x;
+    x x;
+}

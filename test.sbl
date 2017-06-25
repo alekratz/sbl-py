@@ -1,13 +1,14 @@
 # Example program
 # factorial
+import "basic.sbl";
 
 fact {
     # peek and compare to zero
     br {
-        . x ;     # pop into x
-        1 x - ;   # push a copy and subtract 1 from it
-        fact ;    # call factorial
-        x * ;     # multiply whatever our factorial is by x
+        .x;     # pop into x
+        1 x -;   # push a copy and subtract 1 from it
+        fact;    # call factorial
+        x *;     # multiply whatever our factorial is by x
     }
     el {
         # pop off to nothing, and push a 1
@@ -18,11 +19,6 @@ fact {
 
 square {
     dup *;
-}
-
-dup {
-    . x;
-    x x;
 }
 
 test_numbers {
@@ -41,16 +37,14 @@ test_numbers {
     .;
 }
 
-printa {
-    loop { print; }
-}
-
 main {
+    "testing number functions" println;
     test_numbers;
 
     0 '\n 'o 'l 'l 'e 'h printa;
     "world!" println;
-    println;
+    .; # remove this to have a dirty stack
+    $;
     br {
         "The stack was not clean upon exit!" println;
     }
