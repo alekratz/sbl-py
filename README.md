@@ -75,9 +75,12 @@ Or, "room for improvement"
 
 # Release
 ## 0.1.0 release planned features
+This is the order in which I want to complete these things:
+
 * [ ] Import path environment variable
 * [ ] License chosen
 * [ ] Unit tests
+* [ ] Documentation of what we have so far
 
 # License
 **While this project is open source, it is not free software**, for the time being. You must ask permission before
