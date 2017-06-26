@@ -75,14 +75,12 @@ Or, "room for improvement"
 * No savable bytecode
 * No base or standard library
 
-# Release
-## 0.1.0 release planned features
-This is the order in which I want to complete these things:
-
-* [x] Import path environment variable
-* [x] License chosen
-* [x] Unit tests
-* [x] Documentation of what we have so far
+# Releases
+## 0.1.0 release notes (June 26, 2017)
+* Import path environment variable
+* License chosen
+* Unit tests
+* Documentation of what we have so far
 
 # License
 Apache2. See LICENSE file for details.
