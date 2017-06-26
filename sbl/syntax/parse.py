@@ -83,7 +83,7 @@ class Parser:
             end = copy(self.curr.range.start)
             items += [item]
         return Action(Range(start, end), items, pop)
-    
+
     def _expect_branch(self) -> Branch:
         start = copy(self.curr.range.start)
         self._next_expect(TokenType.BR)

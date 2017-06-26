@@ -52,6 +52,9 @@ class Block:
         for it in self.lines:
             yield it
 
+    def __len__(self):
+        return len(self.lines)
+
 
 class Loop:
     def __init__(self, rng: Range, block: Block):
