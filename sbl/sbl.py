@@ -27,7 +27,6 @@ def parse_args():
 def main():
     IMPORT_PATH = 'SBL_PATH'
     error = False
-    fun_table = FunTable()
 
     search_dirs = os.environ[IMPORT_PATH].split(':') if IMPORT_PATH in os.environ else []
     args = parse_args()

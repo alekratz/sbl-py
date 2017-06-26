@@ -1,6 +1,8 @@
 # SBL - Stack Based Language
 Original name, right?
 
+If you're just getting started, check the [wiki](wiki)!
+
 ## This is what it looks like:
 ```
 # Calculates n factorial (n!).
@@ -80,7 +82,7 @@ This is the order in which I want to complete these things:
 * [x] Import path environment variable
 * [x] License chosen
 * [x] Unit tests
-* [ ] Documentation of what we have so far
+* [x] Documentation of what we have so far
 
 # License
 Apache2. See LICENSE file for details.
