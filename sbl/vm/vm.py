@@ -1,4 +1,4 @@
-from sbl.compile import *
+from .compile import *
 from .funs import BUILTINS
 from .val import Val, ValType
 
