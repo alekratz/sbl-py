@@ -65,6 +65,7 @@ You can check out the grammar in [GRAMMAR.md](GRAMMAR.md).
 * Loops
 * A handful of primitive types
 * File path imports
+    * Include paths, too!
 * More to come...
 
 # Non-features
@@ -73,7 +74,6 @@ Or, "room for improvement"
 * Lightning-fast virtual machine and compiler implemented in Python
 * No savable bytecode
 * No base or standard library
-* No include PATH or standard environment variable used
 
 # Release
 ## 0.1.0 release planned features
