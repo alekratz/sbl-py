@@ -1,7 +1,12 @@
-from sbl.syntax.type import ItemType
+from enum import *
 
 
-ValType = ItemType
+class ValType(Enum):
+    INT = 'integer'
+    IDENT = "identifier"
+    CHAR = 'character'
+    STRING = 'string'
+
 
 class Val:
     def __init__(self, val, ty: ValType):

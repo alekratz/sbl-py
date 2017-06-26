@@ -1,7 +1,23 @@
 from sbl.common import *
-from sbl.vm.val import Val
+from sbl.vm.val import *
 from typing import *
-from . type import *
+from enum import *
+
+
+class ItemType(Enum):
+    INT = 'integer'
+    IDENT = "identifier"
+    CHAR = 'character'
+    STRING = 'string'
+
+    def to_val_type(self) -> ValType:
+        mapping = {
+            ItemType.INT: ValType.INT,
+            ItemType.IDENT: ValType.IDENT,
+            ItemType.CHAR: ValType.CHAR,
+            ItemType.STRING: ValType.STRING,
+        }
+        return mapping[self]
 
 
 class Item:
@@ -11,7 +27,7 @@ class Item:
         self.type = ty
 
     def to_val(self) -> Val:
-        return Val(self.val, self.type)
+        return Val(self.val, self.type.to_val_type())
 
     def __str__(self):
         return f"{self.type.value} ({repr(self.val)})"
