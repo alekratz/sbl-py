@@ -76,6 +76,13 @@ Or, "room for improvement"
 * No base or standard library
 
 # Releases
+## 0.2.0 roadmap
+* Discarding N items with pops (e.g. `. 3;` to discard the top 3 items)
+* Stack variables and/or arrays
+* Function pointers or function stack items
+* Start on the standard library
+* Filesystem functions
+
 ## 0.1.0 release notes (June 26, 2017)
 * Import path environment variable
 * License chosen
