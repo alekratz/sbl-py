@@ -1,3 +1,34 @@
+from typing import *
+from sys import stderr
+from abc import ABCMeta, abstractmethod
+
+
+def printerr(*args, **kwargs):
+    print(*args, **kwargs, file=stderr)
+
+
+def underline_source(source: str, rng: 'Range'):
+    MAX_LINE_LEN = 70
+    line_diff = rng.end.line - rng.start.line
+    lines = source.split('\n')
+    # TODO : multi-line underlining
+    if line_diff == 0:
+        # same line
+        sz = rng.end.col - rng.start.col
+    else:
+        sz = len(lines[rng.start.line]) - rng.start.col
+    sz += 1
+    padded_line = lines[rng.start.line]
+    line = padded_line.lstrip()
+    if len(line) > MAX_LINE_LEN:
+        line = line[0:MAX_LINE_LEN] + ' ...'
+    offset = rng.start.col - (len(padded_line) - len(line))
+    return [
+        line,
+        " " * offset + "^" * sz,
+    ]
+
+
 class Pos:
     def __init__(self, col: int, line: int, idx: int):
         self.col = col
@@ -30,11 +61,25 @@ class Range:
             return f"{self.start}-{self.end}"
 
 
-class ParseError(Exception):
-    def __init__(self, msg: str, rng: Range):
-        super().__init__(f"at {rng}: {msg}")
-        self.range = rng
+class PrintErr(Exception, metaclass=ABCMeta):
+    @abstractmethod
+    def printerr(self):
+        pass
 
+
+class ParseError(PrintErr):
+    def __init__(self, msg: str, rng: Range, path: str):
+        super().__init__(f"{rng}: {msg}")
+        self.range = rng
+        self.path = path
+
+    def printerr(self):
+        printerr(f"Parse error in {self.path}:")
+        with open(self.path) as fp:
+            source = fp.read()
+        printerr(f"{' ' * 4}{self}")
+        for line in underline_source(source, self.range):
+            printerr(f"{' ' * 8}{line}")
 
 class VMError(Exception):
     def __init__(self, msg, call_stack):
@@ -53,8 +98,25 @@ class FunError(Exception):
         super().__init__(msg)
 
 
-class PreprocessError(Exception):
-    def __init__(self, rng: Range, path: str):
-        super().__init__(f"error in preprocessing {path}")
+class ChainedError(PrintErr):
+    """
+    A generic error chain.
+    """
+    def __init__(self, message: str, err: PrintErr):
+        super().__init__(f"{message}")
+        self.err = err
+
+    def printerr(self):
+        printerr(self)
+        self.err.printerr()
+
+
+class PreprocessImportError(Exception):
+    """
+    An error where a file failed to import.
+    """
+    def __init__(self, rng: Range, path: str, import_path: List[str]):
+        super().__init__("file not found")
         self.rng = rng
+        self.import_path = import_path
         self.path = path

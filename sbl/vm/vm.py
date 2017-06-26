@@ -1,6 +1,6 @@
 from sbl.compile import *
 from .funs import BUILTINS
-from sbl.syntax.ast import Val, ValType
+from .val import Val, ValType
 
 
 class VMState:
@@ -72,16 +72,16 @@ class VM:
             pc = fun_state.pc
             bc = fun.bc[pc]
             if bc.code == BCType.PUSH:
-                # print(f"PUSH {bc.val}")
+                # printerr(f"PUSH {bc.val}")
                 self.state.push(bc.val)
                 fun_state.pc += 1
             elif bc.code == BCType.POP:
                 item = self.state.pop()
                 if bc.val is not None:
-                    # print(f"POP {bc.val} [= {item}]")
+                    # printerr(f"POP {bc.val} [= {item}]")
                     self.state.store(bc.val.val, item)
                 # else:
-                    # print(f"POP")
+                    # printerr(f"POP")
                 fun_state.pc += 1
             elif bc.code == BCType.JMPZ:
                 assert bc.val.type is ValType.INT
@@ -89,24 +89,24 @@ class VM:
                     raise VMError("could not compare to empty stack", self.state.call_stack)
                 tos = self.state.stack[-1]
                 if not tos.val:
-                    # print(f"JUMP {bc.val}")
+                    # printerr(f"JUMP {bc.val}")
                     fun_state.pc = bc.val.val
                 else:
                     fun_state.pc += 1
             elif bc.code == BCType.JMP:
-                # print(f"JUMP {bc.val
+                # printerr(f"JUMP {bc.val
                 assert bc.val.type is ValType.INT
                 fun_state.pc = bc.val.val
             elif bc.code == BCType.CALL:
-                # print(f"CALL {bc.val} {self.state.stack}")
+                # printerr(f"CALL {bc.val} {self.state.stack}")
                 assert bc.val.type is ValType.IDENT
                 self._call(bc.val.val, f"`{fun_state.name}` at {bc.meta['file']}:{bc.meta['where']}")
                 fun_state.pc += 1
             elif bc.code == BCType.RET:
-                # print("RET")
+                # printerr("RET")
                 break
             elif bc.code == BCType.LOAD:
-                # print(f"LOAD {bc.val}")
+                # printerr(f"LOAD {bc.val}")
                 assert bc.val.type is ValType.IDENT
                 val = self.state.load(bc.val.val)
                 self.state.push(val)
@@ -118,20 +118,21 @@ class VM:
 
     def dump_funtable(self):
         for fun in self.funs:
-            print(f"{fun}:")
+            printerr(f"{fun}:")
             addr = 0
             for bc in self.funs[fun].bc:
-                print("{:05}".format(addr), bc)
+                printerr("{:05}".format(addr), bc)
                 addr += 1
-            print()
 
     def dump_state(self):
-        print("call stack:")
-        for f in reversed(self.state.call_stack):
-            print(' ' * 4, f"{f.name}")
+        printerr("call stack:")
+
+        for f in self.state.call_stack:
+            printerr(f"{' ' * 4}{f.name} (defined at {f.fun.meta['file']}:{f.fun.meta['where']}) "
+                     f"called from {f.callsite}")
+            printerr(f"{' '*4}locals:")
             for l in f.locals:
-                print(' ' * 8, f"{l}: {f.locals[l]}")
-        print()
-        print("stack:")
+                printerr(' ' * 8, f"{l} = {repr(f.locals[l])}")
+        printerr("stack:")
         for s in reversed(self.state.stack):
-            print(' '*4, s)
+            printerr(f"{' '*4}{repr(s)}")

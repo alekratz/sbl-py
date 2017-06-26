@@ -2,85 +2,101 @@
 # A stack-based language written during internet downtime for funsies
 
 import sys
+import os
 from argparse import ArgumentParser
+import argparse
 
 from . vm.vm import *
 from . syntax.prepro import *
+from . common import printerr
 
 
-# TODO
-# * Loops
-# * Types outside of numbers
+# Ideas
+# * elbr - elif-style branch constructs
 # * Labels + goto?
-# * File imports
 
 def parse_args():
     parser = ArgumentParser(description="Runs SBL code.")
-    parser.add_argument('files', metavar='FILE', type=str, nargs='+',
-            help='Files to run')
+    # TODO: -c option like python has
+    parser.add_argument('-v', '--verbose', action='count', help='Show detailed information')
+    parser.add_argument('file', metavar='FILE', type=str, help='File to run')
+    parser.add_argument('argv', metavar='ARGV', nargs=argparse.REMAINDER, help='Program arguments')
     return parser.parse_args()
 
-def underline_source(source: str, rng: Range):
-    MAX_LINE_LEN = 70
-    line_diff = rng.end.line - rng.start.line
-    lines = source.split('\n')
-    # TODO : multi-line underlining
-    if line_diff == 0:
-        # same line
-        sz = rng.end.col - rng.start.col
-    else:
-        sz = len(lines[rng.start.line]) - rng.start.col
-    sz += 1
-    padded_line = lines[rng.start.line]
-    line = padded_line.lstrip()
-    if len(line) > MAX_LINE_LEN:
-        line = line[0:MAX_LINE_LEN] + ' ...'
-    offset = rng.start.col - (len(padded_line) - len(line))
-    return [
-        line,
-        " " * offset + "^" * sz,
-    ]
 
 def main():
-    args = parse_args()
+    IMPORT_PATH = 'SBL_PATH'
     error = False
-
     fun_table = FunTable()
-    for fname in args.files:
-        source_name = fname
+
+    search_dirs = os.environ[IMPORT_PATH].split(':') if IMPORT_PATH in os.environ else []
+    args = parse_args()
+    fname = args.file
+    verbose = args.verbose
+    source_name = fname
+    vm = None
+    # try to get the source text
+    try:
         with open(fname) as fp:
             source = fp.read()
-        try:
-            # build the compiler parts and compile
-            parser = Parser(source)
-            ast = parser.parse()
-            prepro = Preprocess(ast)
-            ast += prepro.preprocess()
-            compiler = Compiler(ast, { 'file': source_name })
-            fun_table.merge(compiler.compile())
-        except ParseError as e:
-            print(f"Parse error in {source_name}:")
-            print(f"{' ' * 4}{e}")
-            for line in underline_source(source, e.range):
-                print(f"{' ' * 8}{line}")
-            error = True
-        except CompileError as e:
-            print(f"Compilation error in {source_name}:")
-            print(f"{' ' * 4}{e}")
-            for line in underline_source(source, e.range):
-                print(f"{' ' * 8}{line}")
-            error = True
+    except FileNotFoundError:
+        printerr(f"File not found: `{fname}`")
+        sys.exit(1)
+    # build the compiler parts and compile
+    try:
+        # parse
+        parser = Parser(source, fname)
+        ast = parser.parse()
+        # preprocess (get imports)
+        prepro = Preprocess(fname, search_dirs, ast)
+        ast += prepro.preprocess()
+        # compile to bytecode
+        compiler = Compiler(ast, { 'file': source_name })
+        fun_table = compiler.compile()
+        # empty programs are valid; just don't run anything
+        if len(fun_table) > 0:
+            vm = VM(fun_table)
+            vm.run()
+    except PreprocessImportError as e:
+        printerr(f"Preprocess error in {fname}:")
+        printerr(f"{' ' * 4}{e.path}: {e}")
+        if verbose:
+            printerr(f"{' ' * 4}Path:")
+            for dirname in e.import_path:
+                printerr(f"{' ' * 8}{repr(dirname)}")
+        error = True
+    except ChainedError as e:
+        printerr(f"Preprocess error caused by {fname}:")
+        e.printerr()
+        error = True
+    except ParseError as e:
+        e.printerr()
+        error = True
+    except CompileError as e:
+        printerr(f"Compilation error in {source_name}:")
+        printerr(f"{' ' * 4}{e}")
+        for line in underline_source(source, e.range):
+            printerr(f"{' ' * 8}{line}")
+        error = True
+    except VMError as e:
+        assert vm is not None
+        printerr(f"Runtime error in {source_name}:")
+        printerr(f"{' ' * 4}{e}")
+        if verbose:
+            printerr("VM state:")
+            vm.dump_state()
+        else:
+            printerr("call stack:")
+            for f in e.call_stack:
+                printerr(f"{' ' * 4}{f.name} (defined at {f.fun.meta['file']}:{f.fun.meta['where']}) "
+                         f"called from {f.callsite}")
+        if verbose >= 2:
+            printerr("VM funtable:")
+            vm.dump_funtable()
+        error = True
     if error:
         sys.exit(1)
-    if len(fun_table) == 0:
-        sys.exit(0)
-    vm = VM(fun_table)
-    try:
-        vm.run()
-    except VMError as e:
-            print(f"Runtime error in {source_name}:")
-            print(f"{' ' * 4}{e}")
-            print("call stack:")
-            for f in e.call_stack:
-                print(f"{' ' * 4}{f.name} (defined at {f.fun.meta['file']}:{f.fun.meta['where']}) "
-                      f"called from {f.callsite}")
+
+
+if __name__ == '__main__':
+    main()

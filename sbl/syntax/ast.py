@@ -1,26 +1,7 @@
 from sbl.common import *
+from sbl.vm.val import Val
 from typing import *
-from enum import *
-
-
-class ItemType(Enum):
-    INT = 'integer'
-    IDENT = "identifier"
-    CHAR = 'character'
-    STRING = 'string'
-
-ValType = ItemType
-
-class Val:
-    def __init__(self, val, ty: ValType):
-        self.val = val
-        self.type = ty
-
-    def __str__(self):
-        return self.val
-
-    def __repr__(self):
-        return f"Val({self.type} `{repr(self.val)}`"
+from . type import *
 
 
 class Item:

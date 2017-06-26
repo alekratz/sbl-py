@@ -1,4 +1,4 @@
-from sbl.syntax.ast import ItemType
+from sbl.syntax.type import ItemType
 
 
 ValType = ItemType
@@ -12,4 +12,4 @@ class Val:
         return str(self.val)
 
     def __repr__(self):
-        return f"Val({self.type} `{repr(self.val)}`"
+        return f"Val({self.type.value} `{repr(self.val)}`)"

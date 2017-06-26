@@ -3,13 +3,14 @@ from . ast import *
 
 
 class Parser:
-    def __init__(self, source: str):
-        self.tokens = Tokenizer(source)
+    def __init__(self, source: str, source_path: str):
+        self.tokens = Tokenizer(source, source_path)
+        self.source_path = source_path
         self.curr = None
         self._next()
 
     def is_end(self) -> bool:
-        return self.tokens.is_end()
+        return self.tokens.is_end() and self.curr is None
 
     def parse(self) -> list:
         return self._expect_source()
@@ -26,7 +27,8 @@ class Parser:
         elif self._can_expect(TokenType.IDENT):
             return self._expect_fundef()
         else:
-            raise ParseError(f"expected fundef or import; instead got {self.curr.type.var}", self.curr.range)
+            raise ParseError(f"expected fundef or import; instead got {self.curr.type.value}", self.curr.range,
+                             self.source_path)
 
     def _expect_import(self) -> Import:
         start = copy(self.curr.range.start)
@@ -66,7 +68,7 @@ class Parser:
         else:
             types += [TokenType.BR]
             raise ParseError(f"expected one of {', '.join(['`' + t.value + '`' for t in types])} token; "
-                             f"instead got `{self.curr}` token", self.curr.range)
+                             f"instead got `{self.curr}` token", self.curr.range, self.source_path)
 
     def _expect_action(self) -> Action:
         start = copy(self.curr.range.start)
@@ -77,7 +79,7 @@ class Parser:
             item = self._expect_item()
             if pop and item.type is not ItemType.IDENT:
                 raise ParseError(f"pop actions only accept identifiers, where a non-identifier (`{item}`) was found",
-                                 item.range)
+                                 item.range, self.source_path)
             end = copy(self.curr.range.start)
             items += [item]
         return Action(Range(start, end), items, pop)
@@ -139,13 +141,14 @@ class Parser:
             return self._next()
         else:
             raise ParseError(f"expected one of {', '.join(['`' + t.value + '`' for t in types])} token; "
-                             f"instead got `{self.curr}` token", self.curr.range)
+                             f"instead got `{self.curr}` token", self.curr.range, self.source_path)
 
     def _next_expect(self, ty: TokenType):
         if self.curr.type == ty:
             return self._next()
         else:
-            raise ParseError(f"expected `{ty.value}` token; instead got `{self.curr}` token", self.curr.range)
+            raise ParseError(f"expected `{ty.value}` token; instead got `{self.curr}` token", self.curr.range,
+                             self.source_path)
 
     def _next(self):
         """

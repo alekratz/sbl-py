@@ -1,6 +1,6 @@
 from enum import *
 
-from sbl.syntax.ast import Val
+from .val import *
 
 
 class BCType(Enum):
@@ -18,6 +18,7 @@ class BCType(Enum):
     CALL = 'CALL'
     # Returns from a function.
     RET = 'RET'
+
 class BC:
     def __init__(self, code: BCType, meta=None, val: Val=None):
         if meta is None:
@@ -28,9 +29,9 @@ class BC:
 
     def __str__(self):
         if self.val:
-            return f"{self.code.val.ljust(6)} {self.val}"
+            return f"{self.code.value.ljust(6)} {repr(self.val)}"
         else:
-            return self.code.val.ljust(6)
+            return self.code.value.ljust(6)
 
     @staticmethod
     def push(meta, val: Val) -> 'BC':

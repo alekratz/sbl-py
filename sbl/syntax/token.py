@@ -1,6 +1,5 @@
 import string
 from copy import copy
-from typing import *
 from enum import *
 
 from sbl.common import *
@@ -99,12 +98,13 @@ class Tokenizer:
     """
     Turns SBL source into text.
     """
-    def __init__(self, source: str):
+    def __init__(self, source: str, source_path: str):
         """
         Creates a new tokenizer from source text.
         :param source: the source text to tokenize.
         """
         self.source = source
+        self.source_path = source_path
         # current character
         self.curr_ch = None
         # pos looks at the position of the current character
@@ -157,10 +157,10 @@ class Tokenizer:
                 if self.curr_ch == '\\':
                     self._adv()
                     if self.curr_ch is None:
-                        raise ParseError(f'expected escape code; instead got EOF', Range(start, end))
+                        raise ParseError(f'expected escape code; instead got EOF', Range(start, end), self.source_path)
                     c = self.curr_ch
                     if c not in escape_map:
-                        raise ParseError(f'unknown escape code: {repr(c)}', Range(start, end))
+                        raise ParseError(f'unknown escape code: {repr(c)}', Range(start, end), self.source_path)
                     c = escape_map[c]
                 else:
                     c = self.curr_ch
@@ -168,7 +168,8 @@ class Tokenizer:
                 self._adv()
                 end = copy(self.pos)
             if self.curr_ch is None:
-                raise ParseError(f'expected string character or close quote; instead got EOF', Range(start, end))
+                raise ParseError(f'expected string character or close quote; instead got EOF', Range(start, end),
+                                 self.source_path)
             assert self.curr_ch == '"'
             self._adv()
             return Token.string(Range(start, end), built)
@@ -179,12 +180,13 @@ class Tokenizer:
             end = copy(self.pos)
             c = self.curr_ch
             if not self._adv_expect(string.ascii_letters + string.digits + syms + '\\'):
-                raise ParseError(f'expected non-whitespace character; instead got {repr(c)}', Range(start, end))
+                raise ParseError(f'expected non-whitespace character; instead got {repr(c)}', Range(start, end),
+                                 self.source_path)
             if c == '\\':
                 c = self.curr_ch
                 # escapes
                 if c not in escape_map:
-                    raise ParseError(f'unknown escape code: {repr(c)}', Range(start, end))
+                    raise ParseError(f'unknown escape code: {repr(c)}', Range(start, end), self.source_path)
                 c = escape_map[c]
                 end = copy(self.pos)
                 self._adv()
@@ -198,7 +200,8 @@ class Tokenizer:
             self._adv()
             # expect at least one hex char
             if not self._adv_expect(string.hexdigits):
-                raise ParseError(f"expected hex digit; instead got {repr(self.curr_ch)}", Range(start, end))
+                raise ParseError(f"expected hex digit; instead got {repr(self.curr_ch)}", Range(start, end),
+                                 self.source_path)
             while self.curr_ch in string.hexdigits:
                 end = copy(self.pos)
                 self._adv()
@@ -213,7 +216,8 @@ class Tokenizer:
             self._adv()
             # expect at least one hex char
             if not self._adv_expect("01"):
-                raise ParseError(f"expected binary digit; instead got {repr(self.curr_ch)}", Range(start, end))
+                raise ParseError(f"expected binary digit; instead got {repr(self.curr_ch)}", Range(start, end),
+                                 self.source_path)
             while self.curr_ch in "01":
                 end = copy(self.pos)
                 self._adv()
@@ -259,7 +263,8 @@ class Tokenizer:
             sym = self.source[start.idx:end.idx + 1]
             return Token.sym(Range(start, end), sym)
         else:
-            raise ParseError(f"unexpected character reached: {repr(self.curr_ch)}", Range(self.pos, self.pos))
+            raise ParseError(f"unexpected character reached: {repr(self.curr_ch)}", Range(self.pos, self.pos),
+                             self.source_path)
 
     def _adv_expect(self, charset) -> bool:
         if self.curr_ch not in charset:
