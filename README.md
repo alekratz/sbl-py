@@ -1,7 +1,7 @@
 # SBL - Stack Based Language
 Original name, right?
 
-If you're just getting started, check the [wiki](wiki)!
+If you're just getting started, check the [wiki](https://git.intercal.top/intercal/sbl/wiki)!
 
 ## This is what it looks like:
 ```
