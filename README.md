@@ -77,7 +77,7 @@ Or, "room for improvement"
 ## 0.1.0 release planned features
 This is the order in which I want to complete these things:
 
-* [ ] Import path environment variable
+* [x] Import path environment variable
 * [ ] License chosen
 * [ ] Unit tests
 * [ ] Documentation of what we have so far
