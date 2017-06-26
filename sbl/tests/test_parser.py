@@ -15,29 +15,15 @@ class TestParser(TestCase):
             self.assertEqual(lhs.val, rhs.val)
 
     def assert_branch(self, branch: Branch, br_block: List[Line], el_block: Optional[List[Line]]=None):
-        self.assert_block(branch.br_block.lines, br_block)
-        self.assert_block(branch.el_block.lines, el_block)
+        self.assertEqual(branch.br_block.lines, br_block)
+        self.assertEqual(branch.el_block.lines, el_block)
 
     def assert_loop(self, loop: Loop, block: List[Line]):
-        self.assert_block(loop.block, block)
-
-    def assert_block(self, lhs: List[Line], rhs: List[Line]):
-        self.assertEqual(lhs is None, rhs is None)
-        if lhs is None: return
-        self.assertEqual(len(lhs), len(rhs))
-        for a, b in zip(lhs, rhs):
-            self.assertIsInstance(b, type(a))
-            self.assertIn(type(a), [Action, Branch, Loop])
-            if type(a) is Action:
-                self.assert_action(a, b.items, a.pop)
-            elif type(a) is Branch:
-                self.assert_branch(a, b.br_block, b.el_block)
-            elif type(a) is Loop:
-                self.assert_loop(a, b.block)
+        self.assertEqual(loop.block, block)
 
     def assert_fun(self, fun: FunDef, name: str, lines: List[Line]):
         self.assertEqual(fun.name, name)
-        self.assert_block(fun.block.lines, lines)
+        self.assertEqual(fun.block.lines, lines)
 
     def test_items(self):
         p = Parser("""
