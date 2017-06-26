@@ -37,10 +37,8 @@ class Preprocess:
             with open(inc_path) as fp:
                 source = fp.read()
                 try:
-                    print("processing", inc_path)
                     parser = Parser(source, inc_path)
                     ast = parser.parse()
-                    print(ast)
                     prepro = Preprocess(inc_path, self.search_dirs, ast, self.ignore)
                     src += prepro.preprocess()
                     src += prepro.ast
