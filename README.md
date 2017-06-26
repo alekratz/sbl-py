@@ -79,7 +79,7 @@ This is the order in which I want to complete these things:
 
 * [x] Import path environment variable
 * [x] License chosen
-* [ ] Unit tests
+* [x] Unit tests
 * [ ] Documentation of what we have so far
 
 # License
