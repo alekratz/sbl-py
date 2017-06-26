@@ -78,12 +78,9 @@ Or, "room for improvement"
 This is the order in which I want to complete these things:
 
 * [x] Import path environment variable
-* [ ] License chosen
+* [x] License chosen
 * [ ] Unit tests
 * [ ] Documentation of what we have so far
 
 # License
-**While this project is open source, it is not free software**, for the time being. You must ask permission before
-copying and distributing the source code.
-
-It will become free software in the future, once the dust has settled.
+Apache2. See LICENSE file for details.
