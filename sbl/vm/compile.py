@@ -12,12 +12,12 @@ class Fun:
         self.meta = meta
 
 
-class FunTable(dict):
+class FunTable(Dict[str, Fun]):
     """
     A function table, with some optional metadata.
     """
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self):
+        pass
 
     def merge(self, other):
         for name in other:
@@ -40,7 +40,7 @@ class Compiler:
         self.fun_names = []
         self.builtins = BUILTINS
         self.meta = meta
-    
+
     def compile(self) -> FunTable:
         # First pass: get the names of each function
         self._build_funtable()

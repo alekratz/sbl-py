@@ -33,6 +33,16 @@ class BC:
         else:
             return self.code.value.ljust(6)
 
+    def __repr__(self):
+        return f"BC ({self.code.value} {repr(self.val)})"
+
+    def __eq__(self, other):
+        return isinstance(other, BC) and self.code == other.code and \
+        (
+            (self.val is not None and self.val == other.val) or
+            self.val is None == other.val is None
+        )
+
     @staticmethod
     def push(meta, val: Val) -> 'BC':
         return BC(BCType.PUSH, meta, val)

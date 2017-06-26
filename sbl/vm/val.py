@@ -13,3 +13,10 @@ class Val:
 
     def __repr__(self):
         return f"Val({self.type.value} `{repr(self.val)}`)"
+
+    def __eq__(self, other):
+        return self.type == other.type and \
+        (
+            (self.val is not None and self.val == other.val) or
+            self.val is None == other.val is None
+        )
