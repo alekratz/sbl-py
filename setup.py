@@ -12,7 +12,9 @@ package = {
     'packages': ['sbl'],
     'entry_points': {
         'console_scripts': ['sbl=sbl.sbl:main']
-    }
+    },
+    'test_suite': 'nose.collector',
+    'tests_require': 'nose',
 }
 
 setup(**package)

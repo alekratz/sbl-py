@@ -13,6 +13,7 @@ escape_map = {
     's': ' ',
     '"': '"',
     "'": "'",
+    '\\': '\\',
 }
 
 class TokenType(Enum):
