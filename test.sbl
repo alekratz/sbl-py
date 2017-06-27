@@ -39,7 +39,6 @@ test-printing {
 }
 
 test-stacks {
-    [@ 1 2 3 4 5] .a a;
     loop {
         println a;
     }
