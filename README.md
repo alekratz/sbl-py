@@ -79,11 +79,14 @@ Or, "room for improvement"
 ## 0.2.0 roadmap
 * [x] Discarding N items with pops (e.g. `. 3;` to discard the top 3 items)
 * [x] Nil sentinel value
-* [ ] Explicit local variable assignment
+* [x] Explicit local variable assignment
+    * This was added in 409361eb as a syntax change.
 * [ ] Stack variables and/or arrays
 * [ ] Function pointers or function stack items
 * [ ] Stack pointers (or pointers in general)
 * [ ] Start on the standard library
+* [ ] Make error types consistent
+* [ ] Document all code we have so far
 
 ## 0.1.0 release notes (June 26, 2017)
 * Import path environment variable
