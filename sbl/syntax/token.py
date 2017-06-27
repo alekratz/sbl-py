@@ -22,7 +22,6 @@ class TokenType(Enum):
     STRING = 'string'
     CHAR = 'character'
     IDENT = 'ident'
-    SYM = 'symbol'
     DOT = 'dot'
     IMPORT = 'import keyword'
     BR = 'br keyword'
@@ -78,10 +77,6 @@ class Token:
     @staticmethod
     def ident(rng: Range, ident: str):
         return Token(TokenType.IDENT, rng, ident)
-
-    @staticmethod
-    def sym(rng: Range, sym: str):
-        return Token(TokenType.SYM, rng, sym)
 
     def __str__(self):
         MAX_LEN = 18
@@ -234,7 +229,7 @@ class Tokenizer:
                 self._adv()
             num = int(self.source[start.idx:end.idx + 1])
             return Token.num(Range(start, end), num)
-        elif self.curr_ch in string.ascii_letters + '_':
+        elif self.curr_ch in string.ascii_letters + syms:
             keywords = {
                 'br': TokenType.BR,
                 'el': TokenType.EL,
@@ -245,7 +240,7 @@ class Tokenizer:
             start = copy(self.pos)
             end = copy(self.pos)
             self._adv()
-            while self.curr_ch in string.ascii_letters + "_-":
+            while self.curr_ch in string.ascii_letters + syms:
                 end = copy(self.pos)
                 self._adv()
             ident = self.source[start.idx:end.idx + 1]
@@ -254,15 +249,6 @@ class Tokenizer:
                 return Token(keywords[ident], Range(start, end))
             else:
                 return Token.ident(Range(start, end), ident)
-        elif self.curr_ch in syms:
-            start = copy(self.pos)
-            end = copy(self.pos)
-            self._adv()
-            while self.curr_ch in syms:
-                end = copy(self.pos)
-                self._adv()
-            sym = self.source[start.idx:end.idx + 1]
-            return Token.sym(Range(start, end), sym)
         else:
             raise ParseError(f"unexpected character reached: {repr(self.curr_ch)}", Range(self.pos, self.pos),
                              self.source_path)

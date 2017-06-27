@@ -1,4 +1,5 @@
 from unittest import TestCase
+
 from sbl.syntax.token import *
 
 
@@ -78,18 +79,23 @@ class TestTokens(TestCase):
         self.assertTrue(t.is_end())
 
     def test_idents(self):
+        # well, idents and symbols
         t = Tokenizer("""
                       this-is-a-valid-ident
-                      this_is_also_a_valid_ident
+                      this!is!also!a!valid!ident
                       branch
                       else
                       looping
                       imported
                       br el loop import
+                      
+                      ! @ $ % ^ & * + - /
+                      !! -- $$ @@ ** ++ //
+                      . { } ;
                       """, 'test')
         def assert_ident(token, payload): self.check_token(token, TokenType.IDENT, payload)
         assert_ident(t.next(), 'this-is-a-valid-ident')
-        assert_ident(t.next(), 'this_is_also_a_valid_ident')
+        assert_ident(t.next(), 'this!is!also!a!valid!ident')
         assert_ident(t.next(), 'branch')
         assert_ident(t.next(), 'else')
         assert_ident(t.next(), 'looping')
@@ -98,34 +104,23 @@ class TestTokens(TestCase):
         self.check_token(t.next(), TokenType.EL)
         self.check_token(t.next(), TokenType.LOOP)
         self.check_token(t.next(), TokenType.IMPORT)
-        self.assertEqual(t.next(), None)
-        self.assertTrue(t.is_end())
-
-    def test_syms(self):
-        t = Tokenizer("""
-                      ! @ $ % ^ & * + - /
-                      !! -- $$ @@ ** ++ //
-                      . { } ;
-                      """, 'test')
-        def assert_sym(token, payload): self.check_token(token, TokenType.SYM, payload)
-        assert_sym(t.next(), '!')
-        assert_sym(t.next(), '@')
-        assert_sym(t.next(), '$')
-        assert_sym(t.next(), '%')
-        assert_sym(t.next(), '^')
-        assert_sym(t.next(), '&')
-        assert_sym(t.next(), '*')
-        assert_sym(t.next(), '+')
-        assert_sym(t.next(), '-')
-        assert_sym(t.next(), '/')
-        assert_sym(t.next(), '!!')
-        assert_sym(t.next(), '--')
-        assert_sym(t.next(), '$$')
-        assert_sym(t.next(), '@@')
-        assert_sym(t.next(), '**')
-        assert_sym(t.next(), '++')
-        assert_sym(t.next(), '//')
-
+        assert_ident(t.next(), '!')
+        assert_ident(t.next(), '@')
+        assert_ident(t.next(), '$')
+        assert_ident(t.next(), '%')
+        assert_ident(t.next(), '^')
+        assert_ident(t.next(), '&')
+        assert_ident(t.next(), '*')
+        assert_ident(t.next(), '+')
+        assert_ident(t.next(), '-')
+        assert_ident(t.next(), '/')
+        assert_ident(t.next(), '!!')
+        assert_ident(t.next(), '--')
+        assert_ident(t.next(), '$$')
+        assert_ident(t.next(), '@@')
+        assert_ident(t.next(), '**')
+        assert_ident(t.next(), '++')
+        assert_ident(t.next(), '//')
         self.check_token(t.next(), TokenType.DOT)
         self.check_token(t.next(), TokenType.LBRACE)
         self.check_token(t.next(), TokenType.RBRACE)

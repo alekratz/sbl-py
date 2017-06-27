@@ -58,7 +58,7 @@ class Parser:
 
     def _expect_stmt(self) -> Stmt:
 
-        types = [TokenType.IDENT, TokenType.NUM, TokenType.CHAR, TokenType.STRING, TokenType.SYM, TokenType.DOT]
+        types = [TokenType.IDENT, TokenType.NUM, TokenType.CHAR, TokenType.STRING, TokenType.DOT]
         if self._can_expect_any(types):
             return self._expect_action()
         elif self._can_expect(TokenType.BR):
@@ -121,7 +121,6 @@ class Parser:
         type_map = {
             TokenType.NUM: ItemType.INT,
             TokenType.IDENT: ItemType.IDENT,
-            TokenType.SYM: ItemType.IDENT,
             TokenType.STRING: ItemType.STRING,
             TokenType.CHAR: ItemType.CHAR,
         }
