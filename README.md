@@ -9,22 +9,19 @@ If you're just getting started, check the [wiki](https://git.intercal.top/interc
 fact {
     # peek and compare to zero
     br {
-        . x ;     # pop into x
-        1 x - ;   # push a copy and subtract 1 from it
-        fact ;    # call factorial
-        x * ;     # multiply whatever our factorial is by x
-        # note: the last 3 lines can be written as one line. i.e.
-        # 1 x - fact x *;
+        .x       # pop into x
+        x 1 -    # push a copy and subtract 1 from it
+        fact     # call factorial
+        x *;     # multiply whatever our factorial is by x
     }
     el {
         # pop off to nothing, and push a 1
-        .;
-        1;
+        .@ 1;
     }
 }
 
 main {
-    0 5 4 3 2 1;
+    @ 5 4 3 2 1;
     loop { fact println; }
 }
 ```
