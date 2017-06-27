@@ -58,7 +58,7 @@ class Parser:
 
     def _expect_stmt(self) -> Stmt:
 
-        types = [TokenType.IDENT, TokenType.NUM, TokenType.CHAR, TokenType.STRING, TokenType.DOT]
+        types = [TokenType.IDENT, TokenType.NUM, TokenType.CHAR, TokenType.STRING, TokenType.DOT, TokenType.NIL]
         if self._can_expect_any(types):
             return self._expect_action()
         elif self._can_expect(TokenType.BR):
@@ -123,6 +123,7 @@ class Parser:
             TokenType.IDENT: ItemType.IDENT,
             TokenType.STRING: ItemType.STRING,
             TokenType.CHAR: ItemType.CHAR,
+            TokenType.NIL: ItemType.NIL,
         }
         item = self._next_expect_any(list(type_map.keys()))
         return Item(item.range, item.payload, type_map[item.type])

@@ -1,6 +1,3 @@
-from enum import *
-from typing import *
-
 from sbl.common import *
 from sbl.vm.val import *
 
@@ -10,6 +7,7 @@ class ItemType(Enum):
     IDENT = "identifier"
     CHAR = 'character'
     STRING = 'string'
+    NIL = 'nil'
 
     def to_val_type(self) -> ValType:
         mapping = {
@@ -17,6 +15,7 @@ class ItemType(Enum):
             ItemType.IDENT: ValType.IDENT,
             ItemType.CHAR: ValType.CHAR,
             ItemType.STRING: ValType.STRING,
+            ItemType.NIL: ValType.NIL,
         }
         return mapping[self]
 

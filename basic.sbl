@@ -1,5 +1,3 @@
-printa { loop { print; } }
-
 # Repeats the top item of the stack N times.
 # Args (top to bottom):
 # N: the number of times to duplicate it

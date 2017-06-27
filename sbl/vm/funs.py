@@ -41,12 +41,18 @@ def div(vm_state):
 
 def print_fn(vm_state):
     item = vm_state.pop()
-    print(str(item), end='')
+    if item.type == ValType.NIL:
+        print('Nil', end='')
+    else:
+        print(str(item), end='')
 
 
 def println_fn(vm_state):
     item = vm_state.pop()
-    print(f"{str(item.val)}")
+    if item.type == ValType.NIL:
+        print('Nil')
+    else:
+        print(f"{str(item.val)}")
 
 
 def stack_size_fn(vm_state):

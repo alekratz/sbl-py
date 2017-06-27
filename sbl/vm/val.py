@@ -6,6 +6,7 @@ class ValType(Enum):
     IDENT = "identifier"
     CHAR = 'character'
     STRING = 'string'
+    NIL = 'nil'
 
 
 class Val:
@@ -17,7 +18,10 @@ class Val:
         return str(self.val)
 
     def __repr__(self):
-        return f"Val({self.type.value} `{repr(self.val)}`)"
+        if self.type is ValType.NIL:
+            return 'Nil'
+        else:
+            return f"Val({self.type.value} `{repr(self.val)}`)"
 
     def __eq__(self, other):
         return self.type == other.type and \

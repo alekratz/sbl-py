@@ -20,7 +20,7 @@ fact {
 square { ^ *; }
 
 test-numbers {
-    0;
+    @;
     1 2 3 4 5;
     loop {
         fact println;
@@ -33,15 +33,16 @@ test-numbers {
     .;
 }
 
+test-printing {
+    @ '\n 'o 'l 'l 'e 'h;
+    loop { print; }
+    "world!" println;
+}
+
 main {
     "testing number functions" println;
     test-numbers;
 
-    0 '\n 'o 'l 'l 'e 'h printa;
-    "world!" println;
-    .; # remove this to have a dirty stack
-    $;
-    br {
-        "The stack was not clean upon exit!" println;
-    }
+    "testing printing functions" println;
+    test-printing;
 }
