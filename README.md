@@ -72,21 +72,30 @@ Or, "room for improvement"
 * No savable bytecode
 * No base or standard library
 
-# Releases
+# Planned features
 ## 0.2.0 roadmap
 * [x] Discarding N items with pops (e.g. `. 3;` to discard the top 3 items)
 * [x] Nil sentinel value
 * [x] Explicit local variable assignment
     * This was added in 409361eb as a syntax change.
 * [ ] Stack variables and/or arrays
-* [ ] Function pointers or function stack items
-* [ ] Stack pointers (or pointers in general)
-* [ ] Start on the standard library
+* [ ] Move off of the master branch when doing dev
+
+## 0.2.x roadmap
+* [ ] Move the wiki to GitHub
 * [ ] Make error types consistent
 * [ ] Document all code we have so far
-* [ ] Move off of the master branch when doing dev
-* [ ] Move the wiki to GitHub
 
+## Wishlist
+* Built-in string concatenation
+* Pointers/references to things (functions, locations on the stack, etc)
+* An actual type system
+* Standard library
+    * IO
+    * Strings
+    * Formatting
+
+# Releases
 ## 0.1.0 release notes (June 26, 2017)
 * Import path environment variable
 * License chosen
