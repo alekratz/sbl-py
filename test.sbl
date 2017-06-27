@@ -17,9 +17,7 @@ fact {
     }
 }
 
-square {
-    2 rep *;
-}
+square { ^ *; }
 
 test_numbers {
     0;

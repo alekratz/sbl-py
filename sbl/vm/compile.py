@@ -12,12 +12,12 @@ class Fun:
         self.meta = meta
 
 
-class FunTable(Dict[str, Fun]):
+class FunTable(dict):
     """
     A function table, with some optional metadata.
     """
-    def __init__(self):
-        pass
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
     def merge(self, other):
         for name in other:

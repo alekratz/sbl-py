@@ -63,8 +63,21 @@ class Range:
 
 class PrintErr(Exception, metaclass=ABCMeta):
     @abstractmethod
-    def printerr(self):
+    def printerr(self, verbose=0):
         pass
+
+
+class ChainedError(PrintErr):
+    """
+    A generic error chain.
+    """
+    def __init__(self, message: str, err: PrintErr):
+        super().__init__(f"{' '*4}in error caused by {message}")
+        self.err = err
+
+    def printerr(self, verbose=0):
+        printerr(self)
+        self.err.printerr(verbose=verbose)
 
 
 class ParseError(PrintErr):
@@ -73,7 +86,7 @@ class ParseError(PrintErr):
         self.range = rng
         self.path = path
 
-    def printerr(self):
+    def printerr(self, verbose=0):
         printerr(f"Parse error in {self.path}:")
         with open(self.path) as fp:
             source = fp.read()
@@ -81,10 +94,28 @@ class ParseError(PrintErr):
         for line in underline_source(source, self.range):
             printerr(f"{' ' * 8}{line}")
 
-class VMError(Exception):
-    def __init__(self, msg, call_stack):
+
+class VMError(PrintErr):
+    def __init__(self, msg, vm, source_file: str, source_range: Range):
         super().__init__(msg)
-        self.call_stack = call_stack
+        self.vm = vm
+        self.source_file = source_file
+        self.source_range = source_range
+
+    def printerr(self, verbose=0):
+        printerr(f"Runtime error in {self.source_file}:{self.source_range}")
+        printerr(f"{' ' * 4}{self}")
+        if verbose:
+            printerr("VM state:")
+            self.vm.dump_state()
+        else:
+            printerr("call stack:")
+            for f in self.vm.state.call_stack:
+                printerr(f"{' ' * 4}{f.name} (defined at {f.fun.meta['file']}:{f.fun.meta['where']}) "
+                         f"called from {f.callsite}")
+        if verbose >= 2:
+            printerr("VM funtable:")
+            self.vm.dump_funtable()
 
 
 class CompileError(Exception):
@@ -96,19 +127,6 @@ class CompileError(Exception):
 class FunError(Exception):
     def __init__(self, msg: str):
         super().__init__(msg)
-
-
-class ChainedError(PrintErr):
-    """
-    A generic error chain.
-    """
-    def __init__(self, message: str, err: PrintErr):
-        super().__init__(f"{message}")
-        self.err = err
-
-    def printerr(self):
-        printerr(self)
-        self.err.printerr()
 
 
 class PreprocessImportError(Exception):

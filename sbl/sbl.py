@@ -65,8 +65,8 @@ def main():
                 printerr(f"{' ' * 8}{repr(dirname)}")
         error = True
     except ChainedError as e:
-        printerr(f"Preprocess error caused by {fname}:")
-        e.printerr()
+        printerr(f"Error caused in {fname}:")
+        e.printerr(verbose=verbose)
         error = True
     except ParseError as e:
         e.printerr()
@@ -78,20 +78,7 @@ def main():
             printerr(f"{' ' * 8}{line}")
         error = True
     except VMError as e:
-        assert vm is not None
-        printerr(f"Runtime error in {source_name}:")
-        printerr(f"{' ' * 4}{e}")
-        if verbose:
-            printerr("VM state:")
-            vm.dump_state()
-        else:
-            printerr("call stack:")
-            for f in e.call_stack:
-                printerr(f"{' ' * 4}{f.name} (defined at {f.fun.meta['file']}:{f.fun.meta['where']}) "
-                         f"called from {f.callsite}")
-        if verbose >= 2:
-            printerr("VM funtable:")
-            vm.dump_funtable()
+        e.printerr(verbose=verbose)
         error = True
     if error:
         sys.exit(1)
