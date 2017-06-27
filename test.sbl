@@ -19,7 +19,7 @@ fact {
 
 square { ^ *; }
 
-test_numbers {
+test-numbers {
     0;
     1 2 3 4 5;
     loop {
@@ -35,7 +35,7 @@ test_numbers {
 
 main {
     "testing number functions" println;
-    test_numbers;
+    test-numbers;
 
     0 '\n 'o 'l 'l 'e 'h printa;
     "world!" println;
