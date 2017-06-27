@@ -78,7 +78,8 @@ Or, "room for improvement"
 # Releases
 ## 0.2.0 roadmap
 * [x] Discarding N items with pops (e.g. `. 3;` to discard the top 3 items)
-* [ ] Nil sentinel value
+* [x] Nil sentinel value
+* [ ] Explicit local variable assignment
 * [ ] Stack variables and/or arrays
 * [ ] Function pointers or function stack items
 * [ ] Stack pointers (or pointers in general)
