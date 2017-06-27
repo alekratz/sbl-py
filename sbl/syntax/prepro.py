@@ -32,7 +32,9 @@ class Preprocess:
                 raise PreprocessImportError(top.range, top.path, self.search_dirs)
             # read and parse the source of the import file
             abs_include = path.abspath(inc_path)
-            if abs_include in self.ignore: continue
+            if abs_include in self.ignore:
+                rm += [top]
+                continue
             self.ignore += [abs_include]
             with open(inc_path) as fp:
                 source = fp.read()

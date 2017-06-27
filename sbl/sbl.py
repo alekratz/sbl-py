@@ -47,7 +47,7 @@ def main():
         parser = Parser(source, fname)
         ast = parser.parse()
         # preprocess (get imports)
-        prepro = Preprocess(fname, search_dirs, ast)
+        prepro = Preprocess(fname, search_dirs, ast, [path.abspath(fname)])
         ast += prepro.preprocess()
         # compile to bytecode
         compiler = Compiler(ast, { 'file': source_name })
