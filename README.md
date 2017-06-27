@@ -84,6 +84,8 @@ Or, "room for improvement"
 * [ ] Start on the standard library
 * [ ] Make error types consistent
 * [ ] Document all code we have so far
+* [ ] Move off of the master branch when doing dev
+* [ ] Move the wiki to GitHub
 
 ## 0.1.0 release notes (June 26, 2017)
 * Import path environment variable
