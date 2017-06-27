@@ -78,11 +78,11 @@ class Loop:
         return isinstance(other, Loop) and self.block == other.block
 
 
-Line = Union[Action, Branch, Loop]
+Stmt = Union[Action, Branch, Loop]
 
 
 class Block:
-    def __init__(self, rng: Range, lines: List[Line]):
+    def __init__(self, rng: Range, lines: List[Stmt]):
         self.range = rng
         self.lines = lines
 

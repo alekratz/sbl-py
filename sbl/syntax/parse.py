@@ -51,12 +51,12 @@ class Parser:
         end = copy(self.curr.range.start)
         lines = []
         while not self._try_expect(TokenType.RBRACE):
-            line = self._expect_line()
+            line = self._expect_stmt()
             end = copy(self.curr.range.start)
             lines += [line]
         return Block(Range(start, end), lines)
 
-    def _expect_line(self) -> Line:
+    def _expect_stmt(self) -> Stmt:
 
         types = [TokenType.IDENT, TokenType.NUM, TokenType.CHAR, TokenType.STRING, TokenType.SYM, TokenType.DOT]
         if self._can_expect_any(types):

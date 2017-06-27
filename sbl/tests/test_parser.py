@@ -14,14 +14,14 @@ class TestParser(TestCase):
             self.assertEqual(lhs.type, rhs.type)
             self.assertEqual(lhs.val, rhs.val)
 
-    def assert_branch(self, branch: Branch, br_block: List[Line], el_block: Optional[List[Line]]=None):
+    def assert_branch(self, branch: Branch, br_block: List[Stmt], el_block: Optional[List[Stmt]]=None):
         self.assertEqual(branch.br_block.lines, br_block)
         self.assertEqual(branch.el_block.lines, el_block)
 
-    def assert_loop(self, loop: Loop, block: List[Line]):
+    def assert_loop(self, loop: Loop, block: List[Stmt]):
         self.assertEqual(loop.block, block)
 
-    def assert_fun(self, fun: FunDef, name: str, lines: List[Line]):
+    def assert_fun(self, fun: FunDef, name: str, lines: List[Stmt]):
         self.assertEqual(fun.name, name)
         self.assertEqual(fun.block.lines, lines)
 
