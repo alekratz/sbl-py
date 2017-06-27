@@ -87,6 +87,8 @@ Or, "room for improvement"
 * [ ] Document all code we have so far
 
 ## Wishlist
+* Support for negative numbers
+* Support for floating point numbers
 * Built-in string concatenation
 * Pointers/references to things (functions, locations on the stack, etc)
 * An actual type system
