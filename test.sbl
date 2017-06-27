@@ -5,15 +5,14 @@ import "basic.sbl";
 fact {
     # peek and compare to zero
     br {
-        .x;     # pop into x
-        x 1 -;   # push a copy and subtract 1 from it
-        fact;    # call factorial
+        .x       # pop into x
+        x 1 -    # push a copy and subtract 1 from it
+        fact     # call factorial
         x *;     # multiply whatever our factorial is by x
     }
     el {
         # pop off to nothing, and push a 1
-        .;
-        1;
+        .@ 1;
     }
 }
 
@@ -30,7 +29,7 @@ test-numbers {
     loop {
         square "value is " print println;
     }
-    .;
+    .@;
 }
 
 test-printing {

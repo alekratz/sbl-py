@@ -45,8 +45,8 @@ class TestCompiler(TestCase):
     def test_pop(self):
         fun_table = self.compile_source('''
             foo {
-                . a b c;
-                .;
+                .a .b .c;
+                .@;
             }
         ''')
         self.assertIn('foo', fun_table)
@@ -55,6 +55,6 @@ class TestCompiler(TestCase):
             BC.pop(None, Val('a', ValType.IDENT)),
             BC.pop(None, Val('b', ValType.IDENT)),
             BC.pop(None, Val('c', ValType.IDENT)),
-            BC.pop(None, None),
+            BC.pop(None, Val(None, ValType.NIL)),
             BC.ret(None),
         ])

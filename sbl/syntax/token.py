@@ -90,6 +90,9 @@ class Token:
             name += f" ({repr(content)})"
         return name
 
+    def __repr__(self):
+        return str(self)
+
 
 class Tokenizer:
     """

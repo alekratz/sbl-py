@@ -84,26 +84,20 @@ class Compiler:
     def _compile_block(self, block: Block, jmp_offset=0) -> List[BC]:
         bc = []
         for stmt in block:
-            if isinstance(stmt, PopAction):
-                # pops are allowed to not pop into anything
-                if stmt.items:
-                    for item in stmt.items:
-                        if item.type is ItemType.IDENT:
-                            bc += [BC.pop(self._meta_with(where=stmt.range), item.to_val())]
-                        elif item.type is ItemType.INT:
-                            bc += [BC.popn(self._meta_with(where=stmt.range), item.to_val())]
-                        else:
-                            assert False, 'item type for PopAction was not ident or int'
-                else:
-                    bc += [BC.pop(self._meta_with(where=stmt.range))]
-            elif isinstance(stmt, PushAction):
-                for item in stmt.items:
-                    if item.val in self.fun_names + list(self.builtins.keys()):
-                        bc += [BC.call(self._meta_with(where=stmt.range), item.to_val())]
-                    elif item.type is ItemType.IDENT:
-                        bc += [BC.load(self._meta_with(where=stmt.range), item.to_val())]
+            if isinstance(stmt, StackStmt):
+                for action in stmt.items:
+                    item = action.item
+                    if action.pop:
+                        assert item.type in [ItemType.IDENT, ItemType.NIL, ItemType.INT],\
+                            f'item type for pop StackAction was not ident, nil, or int: {stmt.item.type}'
+                        bc += [BC.pop(self._meta_with(where=stmt.range), item.to_val())]
                     else:
-                        bc += [BC.push(self._meta_with(where=item.range), item.to_val())]
+                        if item.val in self.fun_names + list(self.builtins.keys()):
+                            bc += [BC.call(self._meta_with(where=stmt.range), item.to_val())]
+                        elif item.type is ItemType.IDENT:
+                            bc += [BC.load(self._meta_with(where=stmt.range), item.to_val())]
+                        else:
+                            bc += [BC.push(self._meta_with(where=item.range), item.to_val())]
             elif isinstance(stmt, Branch):
                 start_addr = len(bc) + jmp_offset  # this is where we insert the first jump, later
                 bc += [None]

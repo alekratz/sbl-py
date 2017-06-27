@@ -30,36 +30,47 @@ class Item:
         return Val(self.val, self.type.to_val_type())
 
     def __str__(self):
-        return f"{self.type.value} ({repr(self.val)})"
+        return f"{self.type.value} {repr(self.val)}"
 
     def __repr__(self):
-        return f"Item({self}))"
+        return f"Item({self})"
 
     def __eq__(self, other):
         return isinstance(other, Item) and self.type == other.type and self.val == other.val
 
 
-class Action(metaclass=ABCMeta):
-    def __init__(self, rng: Range, items: List[Item]):
+class StackAction:
+    def __init__(self, rng: Range, item, pop: bool):
+        self.range = rng
+        self.item = item
+        self.pop = pop
+
+    def __eq__(self, other):
+        return isinstance(other, StackAction) and self.item == other.item and self.pop == other.pop
+
+    def __str__(self):
+        if self.pop:
+            return f". ({repr(self.item)})"
+        else:
+            return f"({repr(self.item)})"
+
+    def __repr__(self):
+        return f"StackAction({self}))"
+
+
+class StackStmt:
+    def __init__(self, rng: Range, items: List[StackAction]):
         self.range = rng
         self.items = items
 
-
-class PushAction(Action):
-    def __init__(self, rng: Range, items: List[Item]):
-        super().__init__(rng, items)
-
     def __eq__(self, other):
-        return isinstance(other, PushAction) and self.items == other.items
+        return isinstance(other, StackStmt) and self.items == other.items
 
+    def __str__(self):
+        return f"[{', '.join(map(str, self.items))}]"
 
-class PopAction(Action):
-    def __init__(self, rng: Range, items: List[Item]):
-        super().__init__(rng, items)
-
-    def __eq__(self, other):
-        return isinstance(other, PopAction) and self.items == other.items
-
+    def __repr__(self):
+        return f"StackStmt ([{', '.join(map(str, self.items))}])"
 
 class Branch:
     """
@@ -90,7 +101,7 @@ class Loop:
         return isinstance(other, Loop) and self.block == other.block
 
 
-Stmt = Union[Action, Branch, Loop]
+Stmt = Union[StackStmt, Branch, Loop]
 
 
 class Block:

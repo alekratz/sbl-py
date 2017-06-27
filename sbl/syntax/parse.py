@@ -70,34 +70,33 @@ class Parser:
             raise ParseError(f"expected one of {', '.join(['`' + t.value + '`' for t in types])} token; "
                              f"instead got `{self.curr}` token", self.curr.range, self.source_path)
 
-    def _expect_action(self) -> Action:
-        if self._can_expect(TokenType.DOT):
-            return self._expect_pop()
-        else:
-            return self._expect_push()
+    def _expect_action(self) -> StackStmt:
+        start = copy(self.curr.range.start)
+        items = []
+        end = copy(self.curr.range.end)
+        while not self._try_expect(TokenType.SEMI):
+            if self._can_expect(TokenType.DOT):
+                items += [self._expect_pop()]
+            else:
+                items += [self._expect_push()]
+            end = copy(self.curr.range.end)
+        return StackStmt(Range(start, end), items)
 
-    def _expect_pop(self) -> PopAction:
+    def _expect_pop(self) -> StackAction:
         start = copy(self.curr.range.start)
         self._next_expect(TokenType.DOT)
-        end = copy(self.curr.range.start)
-        items = []
-        while not self._try_expect(TokenType.SEMI):
-            item = self._expect_item()
-            if item.type not in [ItemType.IDENT, ItemType.INT]:
-                raise ParseError(f"pop actions only accept identifiers and integers, where an invalid item"
-                                 f"(`{item}`) was found", item.range, self.source_path)
-            end = copy(self.curr.range.start)
-            items += [item]
-        return PopAction(Range(start, end), items)
+        end = copy(self.curr.range.end)
+        item = self._expect_item()
+        if item.type not in [ItemType.IDENT, ItemType.NIL, ItemType.INT]:
+            raise ParseError('pop targets must be one of `ident`, `nil`, or `num` tokens',
+                             item.range, self.source_path)
+        return StackAction(Range(start, end), item, True)
 
-    def _expect_push(self) -> PushAction:
+    def _expect_push(self) -> StackAction:
         start = copy(self.curr.range.start)
-        items = []
-        while not self._try_expect(TokenType.SEMI):
-            item = self._expect_item()
-            items += [item]
-        end = copy(self.curr.range.start)
-        return PushAction(Range(start, end), items)
+        end = copy(self.curr.range.end)
+        item = self._expect_item()
+        return StackAction(Range(start, end), item, False)
 
     def _expect_branch(self) -> Branch:
         start = copy(self.curr.range.start)

@@ -8,12 +8,10 @@ class TestParser(TestCase):
         self.assertEqual(item.type, type)
         self.assertEqual(item.val, val)
 
-    def assert_action(self, action: Action, items: List[Item], pop):
+    def assert_action(self, action: StackStmt, items: List[Item], pop):
         self.assertEqual(len(action.items), len(items))
-        self.assertEqual(isinstance(action, PopAction), pop)
         for lhs, rhs in zip(action.items, items):
-            self.assertEqual(lhs.type, rhs.type)
-            self.assertEqual(lhs.val, rhs.val)
+            self.assertEqual(lhs.item, rhs)
 
     def assert_branch(self, branch: Branch, br_block: List[Stmt], el_block: Optional[List[Stmt]]=None):
         self.assertEqual(branch.br_block.lines, br_block)
@@ -74,27 +72,27 @@ class TestParser(TestCase):
             Item(None, 3, ItemType.INT),
             Item(None, 'c', ItemType.IDENT)], False)
         self.assert_loop(p._expect_loop(), [
-            PushAction(None, [
-                Item(None, 'foo', ItemType.IDENT),
-                Item(None, 'bar', ItemType.IDENT),
-                Item(None, 'baz', ItemType.IDENT),
+            StackStmt(None, [
+                StackAction(None, Item(None, 'foo', ItemType.IDENT), False),
+                StackAction(None, Item(None, 'bar', ItemType.IDENT), False),
+                StackAction(None, Item(None, 'baz', ItemType.IDENT), False),
             ])
         ])
         self.assert_branch(p._expect_branch(), [
-                PopAction(None, [
-                    Item(None, 'a', ItemType.IDENT),
-                    Item(None, 'b', ItemType.IDENT),
-                    Item(None, 'c', ItemType.IDENT),
+                StackStmt(None, [
+                    StackAction(None, Item(None, 'a', ItemType.IDENT), True),
+                    StackAction(None, Item(None, 'b', ItemType.IDENT), False),
+                    StackAction(None, Item(None, 'c', ItemType.IDENT), False),
                 ]),
-            ], [PushAction(None, [
-                    Item(None, 0, ItemType.INT),
-                    Item(None, 0, ItemType.INT),
-                    Item(None, 0, ItemType.INT),
+            ], [StackStmt(None, [
+                    StackAction(None, Item(None, 0, ItemType.INT), False),
+                    StackAction(None, Item(None, 0, ItemType.INT), False),
+                    StackAction(None, Item(None, 0, ItemType.INT), False),
                 ]),
-                PopAction(None, [
-                    Item(None, 'a', ItemType.IDENT),
-                    Item(None, 'b', ItemType.IDENT),
-                    Item(None, 'c', ItemType.IDENT),
+                StackStmt(None, [
+                    StackAction(None, Item(None, 'a', ItemType.IDENT), True),
+                    StackAction(None, Item(None, 'b', ItemType.IDENT), False),
+                    StackAction(None, Item(None, 'c', ItemType.IDENT), False),
                 ]),
             ])
         self.assertTrue(p.is_end())
@@ -107,14 +105,18 @@ class TestParser(TestCase):
             """, 'test')
         self.assert_fun(p._expect_fundef(), 'foo', [])
         self.assert_fun(p._expect_fundef(), 'bar', [
-            PopAction(None, [Item(None, 'a', ItemType.IDENT),
-                          Item(None, 'b', ItemType.IDENT),
-                          Item(None, 'c', ItemType.IDENT)])
+            StackStmt(None, [
+                StackAction(None, Item(None, 'a', ItemType.IDENT), True),
+                StackAction(None, Item(None, 'b', ItemType.IDENT), False),
+                StackAction(None, Item(None, 'c', ItemType.IDENT), False),
+            ])
         ])
         self.assert_fun(p._expect_fundef(), 'main', [
-            PushAction(None, [Item(None, 1, ItemType.INT),
-                          Item(None, 2, ItemType.INT),
-                          Item(None, 3, ItemType.INT)])
+            StackStmt(None, [
+                StackAction(None, Item(None, 1, ItemType.INT), False),
+                StackAction(None, Item(None, 2, ItemType.INT), False),
+                StackAction(None, Item(None, 3, ItemType.INT), False),
+            ])
         ])
         self.assertTrue(p.is_end())
 

@@ -3,12 +3,9 @@
 # N: the number of times to duplicate it
 # X: the item to duplicate
 rep {
-    .n x;
-    n;
+    .n .x n;
     loop {
-       1 -;
-       .n;
-       x n;
+       1 - .n x n;
     }
     .n;
 }

@@ -105,7 +105,7 @@ class TestTokens(TestCase):
         self.check_token(t.next(), TokenType.LOOP)
         self.check_token(t.next(), TokenType.IMPORT)
         assert_ident(t.next(), '!')
-        assert_ident(t.next(), '@')
+        self.check_token(t.next(), TokenType.NIL)
         assert_ident(t.next(), '$')
         assert_ident(t.next(), '%')
         assert_ident(t.next(), '^')
