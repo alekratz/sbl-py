@@ -6,7 +6,7 @@ fact {
     # peek and compare to zero
     br {
         .x;     # pop into x
-        1 x -;   # push a copy and subtract 1 from it
+        x 1 -;   # push a copy and subtract 1 from it
         fact;    # call factorial
         x *;     # multiply whatever our factorial is by x
     }
@@ -18,21 +18,19 @@ fact {
 }
 
 square {
-    dup *;
+    2 rep *;
 }
 
 test_numbers {
     0;
     1 2 3 4 5;
     loop {
-        fact print;
-        '\n print;
+        fact println;
     }
 
     1 2 3 4 5;
     loop {
-        square print;
-        '\n print;
+        square "value is " print println;
     }
     .;
 }

@@ -18,7 +18,7 @@ from . common import printerr
 def parse_args():
     parser = ArgumentParser(description="Runs SBL code.")
     # TODO: -c option like python has
-    parser.add_argument('-v', '--verbose', action='count', help='Show detailed information')
+    parser.add_argument('-v', '--verbose', action='count', help='Show detailed information', default=0)
     parser.add_argument('file', metavar='FILE', type=str, help='File to run')
     parser.add_argument('argv', metavar='ARGV', nargs=argparse.REMAINDER, help='Program arguments')
     return parser.parse_args()

@@ -1,6 +1,16 @@
 printa { loop { print; } }
 
-dup {
-    .x;
-    x x;
+# Repeats the top item of the stack N times.
+# Args (top to bottom):
+# N: the number of times to duplicate it
+# X: the item to duplicate
+rep {
+    .n x;
+    n;
+    loop {
+       1 -;
+       .n;
+       x n;
+    }
+    .n;
 }

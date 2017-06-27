@@ -20,8 +20,8 @@ def times(vm_state):
 
 
 def minus(vm_state):
-    lhs = vm_state.pop()
     rhs = vm_state.pop()
+    lhs = vm_state.pop()
     if lhs.type is not rhs.type:
         raise VMError(f"{lhs.type} is not compatible with {rhs.type}", vm_state.call_stack)
     vm_state.push(Val(lhs.val - rhs.val, lhs.type))
@@ -50,6 +50,10 @@ def println_fn(vm_state):
 def stack_size_fn(vm_state):
     vm_state.push(Val(len(vm_state.stack), ValType.INT))
 
+
+def tos_fn(vm_state):
+    vm_state.push(vm_state.stack[-1])
+
 BUILTINS = {
     '+': plus,
     '*': times,
@@ -58,4 +62,5 @@ BUILTINS = {
     'print': print_fn,
     'println': println_fn,
     '$': stack_size_fn,
+    '^': tos_fn,
 }
