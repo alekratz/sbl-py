@@ -39,6 +39,12 @@ def div(vm_state):
     vm_state.push(Val(lhs.val / rhs.val, lhs.type))
 
 
+def equals(vm_state):
+    lhs = vm_state.pop()
+    rhs = vm_state.pop()
+    vm_state.push(Val(1 if lhs == rhs else 0, ValType.INT))
+
+
 def print_fn(vm_state):
     item = vm_state.pop()
     if item.type == ValType.NIL:
@@ -68,6 +74,7 @@ def open_fn(vm_state):
     if mode_val.type != ValType.STRING:
         raise VMError(f'expected a string for the file mode; instead got {mode_val.type}', vm_state.vm,
                       *vm_state.current_loc())
+    raise NotImplementedError()
 
 
 BUILTINS = {
@@ -75,9 +82,12 @@ BUILTINS = {
     '*': times,
     '-': minus,
     '/': div,
+    '==': equals,
     'print': print_fn,
     'println': println_fn,
     '$': stack_size_fn,
     '^': tos_fn,
+    # IO functions
+    'open': open_fn,
 }
 

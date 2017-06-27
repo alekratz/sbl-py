@@ -4,7 +4,7 @@ from enum import *
 
 from sbl.common import *
 
-syms = "!@$%^&*-+/"
+syms = "!@$%^&*-+/="
 escape_map = {
     'n': '\n',
     't': '\t',
