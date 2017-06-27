@@ -1,6 +1,6 @@
+from sbl.syntax.parse import *
 from .bc import *
 from .funs import BUILTINS
-from sbl.syntax.parse import *
 
 
 class Fun:
@@ -83,45 +83,48 @@ class Compiler:
 
     def _compile_block(self, block: Block, jmp_offset=0) -> List[BC]:
         bc = []
-        for line in block:
-            if type(line) is Action:
-                if line.pop:
-                    # pops are allowed to not pop anything
-                    if line.items:
-                        for item in line.items:
-                            bc += [BC.pop(self._meta_with(where=line.range), item.to_val())]
-                    else:
-                        bc += [BC.pop(self._meta_with(where=line.range))]
-                else:
-                    # split up the 'push' action by function names
-                    for item in line.items:
-                        if item.val in self.fun_names + list(self.builtins.keys()):
-                            bc += [BC.call(self._meta_with(where=line.range), item.to_val())]
-                        elif item.type is ItemType.IDENT:
-                            bc += [BC.load(self._meta_with(where=line.range), item.to_val())]
+        for stmt in block:
+            if isinstance(stmt, PopAction):
+                # pops are allowed to not pop into anything
+                if stmt.items:
+                    for item in stmt.items:
+                        if item.type is ItemType.IDENT:
+                            bc += [BC.pop(self._meta_with(where=stmt.range), item.to_val())]
+                        elif item.type is ItemType.INT:
+                            bc += [BC.popn(self._meta_with(where=stmt.range), item.to_val())]
                         else:
-                            bc += [BC.push(self._meta_with(where=item.range), item.to_val())]
-            elif type(line) is Branch:
+                            assert False, 'item type for PopAction was not ident or int'
+                else:
+                    bc += [BC.pop(self._meta_with(where=stmt.range))]
+            elif isinstance(stmt, PushAction):
+                for item in stmt.items:
+                    if item.val in self.fun_names + list(self.builtins.keys()):
+                        bc += [BC.call(self._meta_with(where=stmt.range), item.to_val())]
+                    elif item.type is ItemType.IDENT:
+                        bc += [BC.load(self._meta_with(where=stmt.range), item.to_val())]
+                    else:
+                        bc += [BC.push(self._meta_with(where=item.range), item.to_val())]
+            elif isinstance(stmt, Branch):
                 start_addr = len(bc) + jmp_offset  # this is where we insert the first jump, later
                 bc += [None]
-                bc += self._compile_block(line.br_block, len(bc) + jmp_offset)
-                if line.el_block:
+                bc += self._compile_block(stmt.br_block, len(bc) + jmp_offset)
+                if stmt.el_block:
                     end_addr = len(bc) + jmp_offset
                     bc += [None]
-                    bc[start_addr] = BC.jmpz(self._meta_with(where=line.br_block.range), Val(end_addr + 1, ValType.INT))
-                    bc += self._compile_block(line.el_block, len(bc))
-                    bc[end_addr] = BC.jmp(self._meta_with(where=line.el_block.range), Val(len(bc) + jmp_offset,
+                    bc[start_addr] = BC.jmpz(self._meta_with(where=stmt.br_block.range), Val(end_addr + 1, ValType.INT))
+                    bc += self._compile_block(stmt.el_block, len(bc))
+                    bc[end_addr] = BC.jmp(self._meta_with(where=stmt.el_block.range), Val(len(bc) + jmp_offset,
                                                                                           ValType.INT))
                 else:
                     end_addr = len(bc) + jmp_offset
-                    bc[start_addr] = BC.jmpz(self._meta_with(where=line.br_block.range), Val(end_addr, ValType.INT))
-            elif type(line) is Loop:
+                    bc[start_addr] = BC.jmpz(self._meta_with(where=stmt.br_block.range), Val(end_addr, ValType.INT))
+            elif isinstance(stmt, Loop):
                 start_addr = len(bc) + jmp_offset
                 bc += [None]
-                bc += self._compile_block(line.block, len(bc) + jmp_offset)
-                bc += [BC.jmp(self._meta_with(where=line.block.range), Val(start_addr, ValType.INT))]
+                bc += self._compile_block(stmt.block, len(bc) + jmp_offset)
+                bc += [BC.jmp(self._meta_with(where=stmt.block.range), Val(start_addr, ValType.INT))]
                 end_addr = len(bc) + jmp_offset
-                bc[start_addr] = BC.jmpz(self._meta_with(where=line.block.range), Val(end_addr, ValType.INT))
+                bc[start_addr] = BC.jmpz(self._meta_with(where=stmt.block.range), Val(end_addr, ValType.INT))
             else:
-                assert False, f"line was neither an action nor a branch: {line}"
+                assert False, f"stmt was neither an action nor a branch: {stmt}"
         return bc

@@ -1,5 +1,3 @@
-from enum import *
-
 from .val import *
 
 
@@ -8,6 +6,8 @@ class BCType(Enum):
     PUSH = 'PUSH'
     # Pops an item off the stack, into an identifier (or nothing at all).
     POP = 'POP'
+    # Pops N items off the stack into nothing.
+    POPN = 'POPN'
     # Loads a stored value from memory and pushes its value onto the stack.
     LOAD = 'LOAD'
     # Jumps to a given label, given that the top item of the stack is zero.
@@ -53,6 +53,11 @@ class BC:
             return BC(BCType.POP, meta, val)
         else:
             return BC(BCType.POP, meta, val)
+
+    @staticmethod
+    def popn(meta, val: Val) -> 'BC':
+        assert val.type is ValType.INT, 'non-integer ValType passed to popn'
+        return BC(BCType.POPN, meta, val)
 
     @staticmethod
     def jmpz(meta, val: Val) -> 'BC':

@@ -1,5 +1,5 @@
-from . token import *
-from . ast import *
+from .ast import *
+from .token import *
 
 
 class Parser:
@@ -71,18 +71,33 @@ class Parser:
                              f"instead got `{self.curr}` token", self.curr.range, self.source_path)
 
     def _expect_action(self) -> Action:
+        if self._can_expect(TokenType.DOT):
+            return self._expect_pop()
+        else:
+            return self._expect_push()
+
+    def _expect_pop(self) -> PopAction:
         start = copy(self.curr.range.start)
-        pop = self._try_expect(TokenType.DOT)
+        self._next_expect(TokenType.DOT)
         end = copy(self.curr.range.start)
         items = []
         while not self._try_expect(TokenType.SEMI):
             item = self._expect_item()
-            if pop and item.type is not ItemType.IDENT:
-                raise ParseError(f"pop actions only accept identifiers, where a non-identifier (`{item}`) was found",
-                                 item.range, self.source_path)
+            if item.type not in [ItemType.IDENT, ItemType.INT]:
+                raise ParseError(f"pop actions only accept identifiers and integers, where an invalid item"
+                                 f"(`{item}`) was found", item.range, self.source_path)
             end = copy(self.curr.range.start)
             items += [item]
-        return Action(Range(start, end), items, pop)
+        return PopAction(Range(start, end), items)
+
+    def _expect_push(self) -> PushAction:
+        start = copy(self.curr.range.start)
+        items = []
+        while not self._try_expect(TokenType.SEMI):
+            item = self._expect_item()
+            items += [item]
+        end = copy(self.curr.range.start)
+        return PushAction(Range(start, end), items)
 
     def _expect_branch(self) -> Branch:
         start = copy(self.curr.range.start)

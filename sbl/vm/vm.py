@@ -94,6 +94,12 @@ class VM:
                 if bc.val is not None:
                     self.state.store(bc.val.val, item)
                 fun_state.pc += 1
+            elif bc.code == BCType.POPN:
+                if len(self.state.stack) < bc.val.val:
+                    raise VMError(f"attempted to pop {bc.val.val} items off of a stack with only {len(self.state.stack)}"
+                                  "items", self, bc.meta['file'], bc.meta['where'])
+                self.state.stack = self.state.stack[0:len(self.state.stack) - bc.val.val]
+                fun_state.pc += 1
             elif bc.code == BCType.JMPZ:
                 assert bc.val.type is ValType.INT
                 if len(self.state.stack) == 0:

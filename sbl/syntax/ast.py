@@ -1,7 +1,8 @@
+from enum import *
+from typing import *
+
 from sbl.common import *
 from sbl.vm.val import *
-from typing import *
-from enum import *
 
 
 class ItemType(Enum):
@@ -39,14 +40,26 @@ class Item:
         return isinstance(other, Item) and self.type == other.type and self.val == other.val
 
 
-class Action:
-    def __init__(self, rng: Range, items, pop=False):
+class Action(metaclass=ABCMeta):
+    def __init__(self, rng: Range, items: List[Item]):
         self.range = rng
         self.items = items
-        self.pop = pop
+
+
+class PushAction(Action):
+    def __init__(self, rng: Range, items: List[Item]):
+        super().__init__(rng, items)
 
     def __eq__(self, other):
-        return isinstance(other, Action) and self.pop == other.pop and self.items == other.items
+        return isinstance(other, PushAction) and self.items == other.items
+
+
+class PopAction(Action):
+    def __init__(self, rng: Range, items: List[Item]):
+        super().__init__(rng, items)
+
+    def __eq__(self, other):
+        return isinstance(other, PopAction) and self.items == other.items
 
 
 class Branch:
@@ -66,7 +79,7 @@ class Branch:
                (
                    (self.el_block is not None and self.el_block == other.el_block) or
                    self.el_block is None == other.el_block is None
-                )
+               )
 
 
 class Loop:

@@ -1,4 +1,5 @@
 from unittest import TestCase
+
 from sbl.syntax.parse import *
 
 
@@ -9,7 +10,7 @@ class TestParser(TestCase):
 
     def assert_action(self, action: Action, items: List[Item], pop):
         self.assertEqual(len(action.items), len(items))
-        self.assertEqual(action.pop, pop)
+        self.assertEqual(isinstance(action, PopAction), pop)
         for lhs, rhs in zip(action.items, items):
             self.assertEqual(lhs.type, rhs.type)
             self.assertEqual(lhs.val, rhs.val)
@@ -73,28 +74,28 @@ class TestParser(TestCase):
             Item(None, 3, ItemType.INT),
             Item(None, 'c', ItemType.IDENT)], False)
         self.assert_loop(p._expect_loop(), [
-            Action(None, [
+            PushAction(None, [
                 Item(None, 'foo', ItemType.IDENT),
                 Item(None, 'bar', ItemType.IDENT),
                 Item(None, 'baz', ItemType.IDENT),
-            ], False)
+            ])
         ])
         self.assert_branch(p._expect_branch(), [
-                Action(None, [
+                PopAction(None, [
                     Item(None, 'a', ItemType.IDENT),
                     Item(None, 'b', ItemType.IDENT),
                     Item(None, 'c', ItemType.IDENT),
-                ], True),
-            ], [Action(None, [
+                ]),
+            ], [PushAction(None, [
                     Item(None, 0, ItemType.INT),
                     Item(None, 0, ItemType.INT),
                     Item(None, 0, ItemType.INT),
-                ], False),
-                Action(None, [
+                ]),
+                PopAction(None, [
                     Item(None, 'a', ItemType.IDENT),
                     Item(None, 'b', ItemType.IDENT),
                     Item(None, 'c', ItemType.IDENT),
-                ], True),
+                ]),
             ])
         self.assertTrue(p.is_end())
 
@@ -106,14 +107,14 @@ class TestParser(TestCase):
             """, 'test')
         self.assert_fun(p._expect_fundef(), 'foo', [])
         self.assert_fun(p._expect_fundef(), 'bar', [
-            Action(None, [Item(None, 'a', ItemType.IDENT),
+            PopAction(None, [Item(None, 'a', ItemType.IDENT),
                           Item(None, 'b', ItemType.IDENT),
-                          Item(None, 'c', ItemType.IDENT)], True)
+                          Item(None, 'c', ItemType.IDENT)])
         ])
         self.assert_fun(p._expect_fundef(), 'main', [
-            Action(None, [Item(None, 1, ItemType.INT),
+            PushAction(None, [Item(None, 1, ItemType.INT),
                           Item(None, 2, ItemType.INT),
-                          Item(None, 3, ItemType.INT)], False)
+                          Item(None, 3, ItemType.INT)])
         ])
         self.assertTrue(p.is_end())
 
