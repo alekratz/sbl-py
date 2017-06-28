@@ -63,19 +63,17 @@ test-booleans {
 }
 
 test-stacks {
+    # do weird things with internal stacks
     12 .a 34 .b;
-    [a b] .c;
-    c println;
-    [c 137] .d;
-    d println;
-    [12 ^] .e;
-    e println;
-    #a len 0 ==;
-    #loop {
-    #    .@;
-    #    a pop println .a;
-    #    a len 0 ==;
-    #}
+    [a b] .c [c 555 [1 2 3]] println;
+
+    [1 2 3 4 5] .a;
+    a len 0 !=;
+    loop {
+        .@;
+        a pop println .a;
+        a len 0 !=;
+    }
 }
 
 main {

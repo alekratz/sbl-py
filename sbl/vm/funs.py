@@ -44,6 +44,12 @@ def equals(vm_state):
     vm_state.push(Val(lhs == rhs, ValType.BOOL))
 
 
+def nequals(vm_state):
+    lhs = vm_state.pop()
+    rhs = vm_state.pop()
+    vm_state.push(Val(lhs != rhs, ValType.BOOL))
+
+
 def print_fn(vm_state):
     item = vm_state.pop()
     if item.type == ValType.NIL:
@@ -75,6 +81,14 @@ def pop_fn(vm_state):
     vm_state.push(val)
 
 
+def len_fn(vm_state):
+    tos = vm_state.pop()
+    if tos.type not in [ValType.STACK, ValType.STRING]:
+        raise VMError(f"expected a stack or string for `len` function; instead got {tos.type}", vm_state.vm,
+                      *vm_state.current_loc())
+    vm_state.push(Val(len(tos.val), ValType.INT))
+
+
 def open_fn(vm_state):
     mode_val = vm_state.pop()
     if mode_val.type != ValType.STRING:
@@ -89,8 +103,11 @@ BUILTINS = {
     '-': minus,
     '/': div,
     '==': equals,
+    '!=': nequals,
     'print': print_fn,
     'println': println_fn,
+    'pop': pop_fn,
+    'len': len_fn,
     '$': stack_size_fn,
     '^': tos_fn,
     # IO functions

@@ -3,7 +3,6 @@
 
 import sys
 import os
-import traceback
 from argparse import ArgumentParser
 import argparse
 
