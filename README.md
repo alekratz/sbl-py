@@ -54,12 +54,11 @@ You can check out the grammar in [GRAMMAR.md](GRAMMAR.md).
 # Features
 * Terse syntax
 * Branches
-* Stacks (duh)
+* Loops
 * Recursive functions
 * Order-agnostic function definition
 * Simple, LL(0) grammar (not regular, but close)
 * Built-in function support
-* Loops
 * A handful of primitive types
 * File path imports
     * Include paths, too!
@@ -69,47 +68,17 @@ You can check out the grammar in [GRAMMAR.md](GRAMMAR.md).
 Or, "room for improvement"
 
 * Lightning-fast virtual machine and compiler implemented in Python
-* No savable bytecode
-* No base or standard library
+* No savable bytecode (see #11)
+* No base or standard library (see #9)
 
 # Planned features
-## 0.2.0 roadmap
-* [x] Discarding N items with pops (e.g. `. 3;` to discard the top 3 items)
-* [x] Nil sentinel value
-* [x] Explicit local variable assignment
-    * This was added in 409361eb as a syntax change.
-* [ ] Stack variables and/or arrays
-* [ ] Move off of the master branch when doing dev
-* [ ] Documentation of what we have so far
-
-## 0.2.x roadmap
-* [ ] Move the wiki to GitHub
-* [ ] Make error types consistent
-* [ ] Document all code we have so far
-* [ ] Tests for program behavior
-
-## Wishlist
-* Support for negative numbers
-* Support for floating point numbers
-* Built-in string concatenation
-* Pointers/references to things (functions, locations on the stack, etc)
-* An actual type system
-* Standard library
-    * IO
-    * Strings
-    * Formatting
-    * Math
-* Complex/compound types
-* Optimising compiler
-* Savable/cached bytecode
-* Windows support for everything
+## [0.2.0 roadmap](https://github.com/alekratz/sbl/milestone/1)
 
 # Releases
-## 0.1.0 release notes (June 26, 2017)
-* Import path environment variable
-* License chosen
-* Unit tests
-* Documentation of what we have so far
+## [0.1.0 (June 26, 2017)](https://github.com/alekratz/sbl/releases/tag/v0.1.0)
+
+# Contributing
+Contributions are welcome and happily accepted. Check out [CONTRIBUTING.md](CONTRIBUTING.md) for more details.
 
 # License
 Apache2. See LICENSE file for details.
