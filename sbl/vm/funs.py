@@ -5,7 +5,6 @@ from . val import *
 def plus(vm_state):
     lhs = vm_state.pop()
     rhs = vm_state.pop()
-    print(lhs.type, rhs.type)
     if lhs.type != rhs.type:
         raise VMError(f"{lhs.type} is not compatible with {rhs.type}", vm_state.vm, *vm_state.current_loc())
     # TODO : string concatenation

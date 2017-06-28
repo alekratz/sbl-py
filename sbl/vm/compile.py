@@ -99,13 +99,14 @@ class Compiler:
                         else:
                             bc += [BC.push(self._meta_with(where=item.range), item.to_val())]
             elif isinstance(stmt, Branch):
-                start_addr = len(bc) + jmp_offset  # this is where we insert the first jump, later
+                start_addr = len(bc) # this is where we insert the first jump, later
                 bc += [None]
                 bc += self._compile_block(stmt.br_block, len(bc) + jmp_offset)
                 if stmt.el_block:
-                    end_addr = len(bc) + jmp_offset
+                    end_addr = len(bc)
                     bc += [None]
-                    bc[start_addr] = BC.jmpz(self._meta_with(where=stmt.br_block.range), Val(end_addr + 1, ValType.INT))
+                    bc[start_addr] = BC.jmpz(self._meta_with(where=stmt.br_block.range), Val(jmp_offset + end_addr + 1,
+                                                                                             ValType.INT))
                     bc += self._compile_block(stmt.el_block, len(bc))
                     bc[end_addr] = BC.jmp(self._meta_with(where=stmt.el_block.range), Val(len(bc) + jmp_offset,
                                                                                           ValType.INT))
@@ -113,10 +114,10 @@ class Compiler:
                     end_addr = len(bc) + jmp_offset
                     bc[start_addr] = BC.jmpz(self._meta_with(where=stmt.br_block.range), Val(end_addr, ValType.INT))
             elif isinstance(stmt, Loop):
-                start_addr = len(bc) + jmp_offset
+                start_addr = len(bc)
                 bc += [None]
                 bc += self._compile_block(stmt.block, len(bc) + jmp_offset)
-                bc += [BC.jmp(self._meta_with(where=stmt.block.range), Val(start_addr, ValType.INT))]
+                bc += [BC.jmp(self._meta_with(where=stmt.block.range), Val(start_addr + jmp_offset, ValType.INT))]
                 end_addr = len(bc) + jmp_offset
                 bc[start_addr] = BC.jmpz(self._meta_with(where=stmt.block.range), Val(end_addr, ValType.INT))
             else:
