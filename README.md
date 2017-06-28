@@ -80,11 +80,13 @@ Or, "room for improvement"
     * This was added in 409361eb as a syntax change.
 * [ ] Stack variables and/or arrays
 * [ ] Move off of the master branch when doing dev
+* [ ] Documentation of what we have so far
 
 ## 0.2.x roadmap
 * [ ] Move the wiki to GitHub
 * [ ] Make error types consistent
 * [ ] Document all code we have so far
+* [ ] Tests for program behavior
 
 ## Wishlist
 * Support for negative numbers
@@ -96,6 +98,11 @@ Or, "room for improvement"
     * IO
     * Strings
     * Formatting
+    * Math
+* Complex/compound types
+* Optimising compiler
+* Savable/cached bytecode
+* Windows support for everything
 
 # Releases
 ## 0.1.0 release notes (June 26, 2017)
