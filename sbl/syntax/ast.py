@@ -1,5 +1,6 @@
 from sbl.common import *
 from sbl.vm.val import *
+from sbl.syntax.token import TokenType
 
 
 class ItemType(Enum):
@@ -8,6 +9,7 @@ class ItemType(Enum):
     CHAR = 'character'
     STRING = 'string'
     BOOL = 'boolean'
+    STACK = 'stack'
     NIL = 'nil'
 
     def to_val_type(self) -> ValType:
@@ -18,18 +20,44 @@ class ItemType(Enum):
             ItemType.STRING: ValType.STRING,
             ItemType.NIL: ValType.NIL,
             ItemType.BOOL: ValType.BOOL,
+            ItemType.STACK: ValType.STACK,
         }
         return mapping[self]
 
 
-class Item:
+class AST(metaclass=ABCMeta):
+    def __init__(self, range: Range):
+        self.range = range
+
+    @staticmethod
+    @abstractmethod
+    def lookaheads() -> List[TokenType]:
+        pass
+
+
+class Item(AST):
     def __init__(self, rng: Range, val, ty: ItemType):
-        self.range = rng
+        super().__init__(rng)
         self.val = val
         self.type = ty
 
+    def is_const(self) -> bool:
+        if self.type in [ItemType.INT, ItemType.CHAR, ItemType.STRING, ItemType.NIL, ItemType.BOOL]:
+            return True
+        elif self.type is ItemType.IDENT:
+            return False
+        else:
+            assert self.type is ItemType.STACK, f'for some reason got {self.type}'
+            assert isinstance(self.val, list)
+            return all(map(Item.is_const, self.val))
+
     def to_val(self) -> Val:
-        return Val(self.val, self.type.to_val_type())
+        assert (self.type is ItemType.STACK and self.is_const()) or self.type is not ItemType.STACK
+        if self.type is ItemType.STACK:
+            # handle stacks specially
+            return Val(list(map(Item.to_val, self.val)), self.type.to_val_type())
+        else:
+            return Val(self.val, self.type.to_val_type())
 
     def __str__(self):
         return f"{self.type.value} {repr(self.val)}"
@@ -40,10 +68,15 @@ class Item:
     def __eq__(self, other):
         return isinstance(other, Item) and self.type == other.type and self.val == other.val
 
+    @staticmethod
+    def lookaheads() -> List[TokenType]:
+        return [TokenType.IDENT, TokenType.NUM, TokenType.CHAR, TokenType.STRING, TokenType.NIL, TokenType.T,
+                TokenType.F, TokenType.LBRACK]
 
-class StackAction:
+
+class StackAction(AST):
     def __init__(self, rng: Range, item, pop: bool):
-        self.range = rng
+        super().__init__(rng)
         self.item = item
         self.pop = pop
 
@@ -59,10 +92,14 @@ class StackAction:
     def __repr__(self):
         return f"StackAction({self}))"
 
+    @staticmethod
+    def lookaheads() -> List[TokenType]:
+        return Item.lookaheads() + [TokenType.DOT]
 
-class StackStmt:
+
+class StackStmt(AST):
     def __init__(self, rng: Range, items: List[StackAction]):
-        self.range = rng
+        super().__init__(rng)
         self.items = items
 
     def __eq__(self, other):
@@ -74,7 +111,12 @@ class StackStmt:
     def __repr__(self):
         return f"StackStmt ([{', '.join(map(str, self.items))}])"
 
-class Branch:
+    @staticmethod
+    def lookaheads() -> List[TokenType]:
+        return StackAction.lookaheads() + [TokenType.SEMI]
+
+
+class Branch(AST):
     """
     A branch statement. A branch may optionally have a trailing "el" block as
     well.
@@ -82,7 +124,7 @@ class Branch:
     :el: the list of lines held by the el block.
     """
     def __init__(self, rng: Range, br_block: 'Block', el_block: 'Block'):
-        self.range = rng
+        super().__init__(rng)
         self.br_block = br_block
         self.el_block = el_block
 
@@ -93,22 +135,30 @@ class Branch:
                    self.el_block is None == other.el_block is None
                )
 
+    @staticmethod
+    def lookaheads() -> List[TokenType]:
+        return [TokenType.BR]
 
-class Loop:
+
+class Loop(AST):
     def __init__(self, rng: Range, block: 'Block'):
-        self.range = rng
+        super().__init__(rng)
         self.block = block
 
     def __eq__(self, other):
         return isinstance(other, Loop) and self.block == other.block
 
+    @staticmethod
+    def lookaheads() -> List[TokenType]:
+        return [TokenType.LOOP]
+
 
 Stmt = Union[StackStmt, Branch, Loop]
 
 
-class Block:
+class Block(AST):
     def __init__(self, rng: Range, lines: List[Stmt]):
-        self.range = rng
+        super().__init__(rng)
         self.lines = lines
 
     def __iter__(self):
@@ -129,24 +179,35 @@ class Block:
             if l1 != l2: return False
         return True
 
+    @staticmethod
+    def lookaheads() -> List[TokenType]:
+        return [TokenType.LBRACE]
 
-class FunDef:
+
+class FunDef(AST):
     def __init__(self, rng: Range, name: str, block: Block):
-        self.range = rng
+        super().__init__(rng)
         self.name = name
         self.block = block
 
     def __eq__(self, other):
         return self.name == other.name and self.block == other.block
 
+    @staticmethod
+    def lookaheads() -> List[TokenType]:
+        return [TokenType.IDENT]
 
-class Import:
+class Import(AST):
     def __init__(self, rng: Range, path: str):
-        self.range = rng
+        super().__init__(rng)
         self.path = path
 
     def __eq__(self, other):
         return self.path == other.path
+
+    @staticmethod
+    def lookaheads() -> List[TokenType]:
+        return [TokenType.IMPORT]
 
 TopLevel = Union[FunDef, Import]
 Source = List[TopLevel]

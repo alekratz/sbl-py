@@ -6,6 +6,8 @@ class BCType(Enum):
     PUSH = 'PUSH'
     # Pops an item off the stack, into an identifier (or nothing at all).
     POP = 'POP'
+    # Pushes the top item of the global stack into the next item, which is expected to be a local stack.
+    PUSHL = 'PUSHL'
     # Pops N items off the stack into nothing.
     POPN = 'POPN'
     # Loads a stored value from memory and pushes its value onto the stack.
@@ -21,6 +23,7 @@ class BCType(Enum):
 
 class BC:
     def __init__(self, code: BCType, meta=None, val: Val=None):
+        assert val is None or (isinstance(val, Val) and isinstance(val.type, ValType))
         if meta is None:
             meta = {}
         self.code = code
@@ -46,6 +49,10 @@ class BC:
     @staticmethod
     def push(meta, val: Val) -> 'BC':
         return BC(BCType.PUSH, meta, val)
+
+    @staticmethod
+    def pushl(meta) -> 'BC':
+        return BC(BCType.PUSHL, meta)
 
     @staticmethod
     def pop(meta, val: Val=None) -> 'BC':

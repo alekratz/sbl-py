@@ -89,6 +89,15 @@ class VM:
             if bc.code == BCType.PUSH:
                 self.state.push(bc.val)
                 fun_state.pc += 1
+            elif bc.code == BCType.PUSHL:
+                item = self.state.pop()
+                stack = self.state.pop()
+                if stack.type is not ValType.STACK:
+                    raise VMError(f"attempted to push values into non-stack item: {stack.type}", self, bc.meta['file'],
+                                  bc.meta['where'])
+                stack.val.append(item)
+                self.state.push(stack)
+                fun_state.pc += 1
             elif bc.code == BCType.POP:
                 item = self.state.pop()
                 if bc.val is not None:
@@ -146,6 +155,11 @@ class VM:
             printerr(f"{' '*4}locals:")
             for l in f.locals:
                 printerr(' ' * 8, f"{l} = {repr(f.locals[l])}")
+        fun = self.state.call_stack[-1]
+        printerr("last function:", fun.name)
+        printerr(f"{' '*4}PC:               {fun.pc}")
+        printerr(f"{' '*4}Last instruction: {fun.fun.bc[fun.pc]}")
+
         printerr("stack:")
         for s in reversed(self.state.stack):
             printerr(f"{' '*4}{repr(s)}")

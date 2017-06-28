@@ -62,6 +62,22 @@ test-booleans {
     }
 }
 
+test-stacks {
+    12 .a 34 .b;
+    [a b] .c;
+    c println;
+    [c 137] .d;
+    d println;
+    [12 ^] .e;
+    e println;
+    #a len 0 ==;
+    #loop {
+    #    .@;
+    #    a pop println .a;
+    #    a len 0 ==;
+    #}
+}
+
 main {
     "testing number functions" println;
     test-numbers;
@@ -71,6 +87,9 @@ main {
 
     "testing booleans" println;
     test-booleans;
+
+    "testing stacks" println;
+    test-stacks;
 
     $ print " items leftover on the stack" println;
 }

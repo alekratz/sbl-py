@@ -53,11 +53,8 @@ def print_fn(vm_state):
 
 
 def println_fn(vm_state):
-    item = vm_state.pop()
-    if item.type == ValType.NIL:
-        print('Nil')
-    else:
-        print(f"{str(item.val)}")
+    print_fn(vm_state)
+    print()
 
 
 def stack_size_fn(vm_state):
@@ -66,6 +63,16 @@ def stack_size_fn(vm_state):
 
 def tos_fn(vm_state):
     vm_state.push(vm_state.stack[-1])
+
+
+def pop_fn(vm_state):
+    tos = vm_state.pop()
+    if tos.type is not ValType.STACK:
+        raise VMError(f"expected a stack for `pop` function; instead got {tos.type}", vm_state.vm,
+                      *vm_state.current_loc())
+    val = tos.val.pop()
+    vm_state.push(tos)
+    vm_state.push(val)
 
 
 def open_fn(vm_state):

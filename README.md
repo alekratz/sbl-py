@@ -47,7 +47,6 @@ files, multiple files may be supplied from the command line.
 
 ## Examples
 * `sbl test.sbl`
-* `sbl test1.sbl test2.sbl`
 
 Note that SBL files must not contain duplicate functions; this is a compile-time error if they do.
 

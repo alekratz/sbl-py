@@ -1,5 +1,5 @@
-from .ast import *
-from .token import *
+from sbl.syntax.ast import *
+from sbl.syntax.token import *
 
 
 class Parser:
@@ -22,9 +22,9 @@ class Parser:
         return funs
 
     def _expect_top_level(self) -> TopLevel:
-        if self._can_expect(TokenType.IMPORT):
+        if self._can_expect_any(Import.lookaheads()):
             return self._expect_import()
-        elif self._can_expect(TokenType.IDENT):
+        elif self._can_expect_any(FunDef.lookaheads()):
             return self._expect_fundef()
         else:
             raise ParseError(f"expected fundef or import; instead got {self.curr.type.value}", self.curr.range,
@@ -57,16 +57,14 @@ class Parser:
         return Block(Range(start, end), lines)
 
     def _expect_stmt(self) -> Stmt:
-        types = [TokenType.IDENT, TokenType.NUM, TokenType.CHAR, TokenType.STRING, TokenType.DOT, TokenType.NIL,
-                 TokenType.T, TokenType.F]
-        if self._can_expect_any(types):
+        if self._can_expect_any(StackStmt.lookaheads()):
             return self._expect_action()
-        elif self._can_expect(TokenType.BR):
+        elif self._can_expect_any(Branch.lookaheads()):
             return self._expect_branch()
-        elif self._can_expect(TokenType.LOOP):
+        elif self._can_expect_any(Loop.lookaheads()):
             return self._expect_loop()
         else:
-            types += [TokenType.BR]
+            types = StackStmt.lookaheads() + Branch.lookaheads() + Loop.lookaheads()
             raise ParseError(f"expected one of {', '.join(['`' + t.value + '`' for t in types])} token; "
                              f"instead got `{self.curr}` token", self.curr.range, self.source_path)
 
@@ -117,6 +115,9 @@ class Parser:
         return Loop(Range(start, end), block)
 
     def _expect_item(self) -> Item:
+        # stack literals are special, so try to match those first
+        if self._can_expect(TokenType.LBRACK):
+            return self._expect_stack()
         type_map = {
             TokenType.NUM: ItemType.INT,
             TokenType.IDENT: ItemType.IDENT,
@@ -133,6 +134,16 @@ class Parser:
             return Item(item.range, False, type_map[item.type])
         else:
             return Item(item.range, item.payload, type_map[item.type])
+
+    def _expect_stack(self) -> Item:
+        start = copy(self.curr.range.start)
+        self._next_expect(TokenType.LBRACK)
+        end = copy(self.curr.range.start)
+        items = []
+        while not self._try_expect(TokenType.RBRACK):
+            items += [self._expect_item()]
+            end = copy(self.curr.range.end)
+        return Item(Range(start, end), items, ItemType.STACK)
 
     def _expect_ident(self) -> str:
         return self._next_expect(TokenType.IDENT).payload

@@ -85,19 +85,7 @@ class Compiler:
         bc = []
         for stmt in block:
             if isinstance(stmt, StackStmt):
-                for action in stmt.items:
-                    item = action.item
-                    if action.pop:
-                        assert item.type in [ItemType.IDENT, ItemType.NIL, ItemType.INT],\
-                            f'item type for pop StackAction was not ident, nil, or int: {stmt.item.type}'
-                        bc += [BC.pop(self._meta_with(where=stmt.range), item.to_val())]
-                    else:
-                        if item.val in self.fun_names + list(self.builtins.keys()):
-                            bc += [BC.call(self._meta_with(where=stmt.range), item.to_val())]
-                        elif item.type is ItemType.IDENT:
-                            bc += [BC.load(self._meta_with(where=stmt.range), item.to_val())]
-                        else:
-                            bc += [BC.push(self._meta_with(where=item.range), item.to_val())]
+                bc += self._compile_stack_stmt(stmt)
             elif isinstance(stmt, Branch):
                 start_addr = len(bc) # this is where we insert the first jump, later
                 bc += [None]
@@ -122,4 +110,43 @@ class Compiler:
                 bc[start_addr] = BC.jmpz(self._meta_with(where=stmt.block.range), Val(end_addr, ValType.INT))
             else:
                 assert False, f"stmt was neither an action nor a branch: {stmt}"
+        return bc
+
+    def _compile_stack_stmt(self, stmt: StackStmt) -> List[BC]:
+        bc = []
+        for action in stmt.items:
+            item = action.item
+            if action.pop:
+                meta = self._meta_with(where=item.range)
+                assert item.type in [ItemType.IDENT, ItemType.NIL, ItemType.INT], \
+                    f'item type for pop StackAction was not ident, nil, or int: {stmt.item.type}'
+                bc += [BC.pop(meta, item.to_val())]
+            else:
+                bc += self._compile_item_push(item)
+        return bc
+
+    def _compile_item_push(self, item: Item) -> List[BC]:
+        meta = self._meta_with(where=item.range)
+        if item.val in self.fun_names + list(self.builtins.keys()):
+            bc = [BC.call(meta, item.to_val())]
+        elif item.type is ItemType.IDENT:
+            bc = [BC.load(meta, item.to_val())]
+        elif item.type is ItemType.STACK:
+            bc = self._compile_local_stack(item)
+        else:
+            bc = [BC.push(meta, item.to_val())]
+        return bc
+
+    def _compile_local_stack(self, item: Item) -> List[BC]:
+        assert item.type is ItemType.STACK, 'called _compile_local_stack with non-ItemType.STACK item'
+        bc = []
+        meta = self._meta_with(where=item.range)
+        if item.is_const():
+            # allow the stack to be a single value because nothing has to be loaded
+            bc += [BC.push(meta, item.to_val())]
+        else:
+            assert isinstance(item.val, list)
+            bc += [BC.push(meta, Val([], ValType.STACK))]
+            for item_val in item.val:
+                bc += self._compile_item_push(item_val) + [BC.pushl(meta)]
         return bc

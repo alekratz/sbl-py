@@ -3,12 +3,13 @@
 
 import sys
 import os
+import traceback
 from argparse import ArgumentParser
 import argparse
 
-from . vm.vm import *
-from . syntax.prepro import *
-from . common import printerr
+from sbl.vm.vm import *
+from sbl.syntax.prepro import *
+from sbl.common import *
 
 
 # Ideas
@@ -55,7 +56,15 @@ def main():
         # empty programs are valid; just don't run anything
         if len(fun_table) > 0:
             vm = VM(fun_table)
-            vm.run()
+            try:
+                vm.run()
+            except KeyboardInterrupt:
+                printerr()
+                printerr("VM interrupted; shutting down.")
+                if verbose:
+                    if verbose >= 2:
+                        vm.dump_funtable()
+                    vm.dump_state()
     except PreprocessImportError as e:
         printerr(f"Preprocess error in {fname}:")
         printerr(f"{' ' * 4}{e.path}: {e}")
@@ -79,6 +88,12 @@ def main():
         error = True
     except VMError as e:
         e.printerr(verbose=verbose)
+        error = True
+    except RecursionError as e:
+        # TODO : pretty this error up some
+        printerr("Internal stack overflow - exiting with error.")
+        if verbose:
+            printerr(f"{' '*4}{e}")
         error = True
     if error:
         sys.exit(1)

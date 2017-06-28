@@ -33,6 +33,8 @@ class TokenType(Enum):
     SEMI = 'semicolon'
     LBRACE = 'left brace'
     RBRACE = 'right brace'
+    LBRACK = 'left square bracket'
+    RBRACK = 'right square bracket'
 
 
 class Token:
@@ -76,6 +78,14 @@ class Token:
     @staticmethod
     def rbrace(rng: Range):
         return Token(TokenType.RBRACE, rng)
+
+    @staticmethod
+    def lbrack(rng: Range):
+        return Token(TokenType.LBRACK, rng)
+
+    @staticmethod
+    def rbrack(rng: Range):
+        return Token(TokenType.RBRACK, rng)
 
     @staticmethod
     def ident(rng: Range, ident: str):
@@ -149,6 +159,14 @@ class Tokenizer:
             start = end = copy(self.pos)
             self._adv()
             return Token.rbrace(Range(start, end))
+        elif self.curr_ch == '[':
+            start = end = copy(self.pos)
+            self._adv()
+            return Token.lbrack(Range(start, end))
+        elif self.curr_ch == ']':
+            start = end = copy(self.pos)
+            self._adv()
+            return Token.rbrack(Range(start, end))
         elif self.curr_ch == '"':
             # string
             start = copy(self.pos)
