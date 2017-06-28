@@ -7,16 +7,19 @@ If you're just getting started, check the [wiki](https://github.com/alekratz/sbl
 ```
 # Calculates n factorial (n!).
 fact {
-    # peek and compare to zero
+    # duplicate and compare to zero
+    ^ 0 ==;
     br {
+        .@;
+        # pop off to nothing, and push a 1
+        .@ 1;
+    }
+    el {
+        .@;
         .x       # pop into x
         x 1 -    # push a copy and subtract 1 from it
         fact     # call factorial
         x *;     # multiply whatever our factorial is by x
-    }
-    el {
-        # pop off to nothing, and push a 1
-        .@ 1;
     }
 }
 
@@ -69,7 +72,7 @@ Or, "room for improvement"
 
 * Lightning-fast virtual machine and compiler implemented in Python
 * No savable bytecode (see [#11](../../issues/11))
-* No base or standard library (see [#9](../../issues/9))
+* No base or standard library (see [#9](/issues/9))
 
 # Planned features
 ## [0.2.0 roadmap](https://github.com/alekratz/sbl/milestone/1)
