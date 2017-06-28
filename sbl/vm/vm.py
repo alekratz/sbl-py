@@ -105,7 +105,8 @@ class VM:
                 if len(self.state.stack) == 0:
                     raise VMError("could not compare to empty stack", self, bc.meta['file'], bc.meta['where'])
                 tos = self.state.stack[-1]
-                if not tos.val:
+                # only jmpz on on Nil and False values
+                if (tos.type is ValType.BOOL and tos.val == False) or tos.type is ValType.NIL:
                     fun_state.pc = bc.val.val
                 else:
                     fun_state.pc += 1

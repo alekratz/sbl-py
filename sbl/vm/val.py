@@ -7,6 +7,7 @@ class ValType(Enum):
     CHAR = 'character'
     STRING = 'string'
     NIL = 'nil'
+    BOOL = 'bool'
 
 
 class Val:

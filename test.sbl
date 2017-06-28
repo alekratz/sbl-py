@@ -3,16 +3,19 @@
 import "basic.sbl";
 
 fact {
-    # peek and compare to zero
+    # duplicate and compare to zero
+    ^ 0 ==;
     br {
+        .@;
+        # pop off to nothing, and push a 1
+        .@ 1;
+    }
+    el {
+        .@;
         .x       # pop into x
         x 1 -    # push a copy and subtract 1 from it
         fact     # call factorial
         x *;     # multiply whatever our factorial is by x
-    }
-    el {
-        # pop off to nothing, and push a 1
-        .@ 1;
     }
 }
 
@@ -38,9 +41,24 @@ test-printing {
     "world!" println;
 }
 
-test-stacks {
-    loop {
-        println a;
+test-booleans {
+    5 ng .l l .r;
+    l r ==;
+    br {
+        l print " == " print r println;
+    }
+
+    T;
+    br {
+        "br block" println;
+        print " value is on top of the stack" println;
+        .@;
+    }
+    F;
+    br {} el {
+        "el block" println;
+        print " value is on top of the stack" println;
+        .@;
     }
 }
 
@@ -51,9 +69,8 @@ main {
     "testing printing functions" println;
     test-printing;
 
-    5 ng .l l .r;
-    l r ==;
-    br {
-        l print " == " print r println;
-    }
+    "testing booleans" println;
+    test-booleans;
+
+    $ print " items leftover on the stack" println;
 }

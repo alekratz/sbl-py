@@ -41,7 +41,7 @@ def div(vm_state):
 def equals(vm_state):
     lhs = vm_state.pop()
     rhs = vm_state.pop()
-    vm_state.push(Val(1 if lhs == rhs else 0, ValType.INT))
+    vm_state.push(Val(lhs == rhs, ValType.BOOL))
 
 
 def print_fn(vm_state):

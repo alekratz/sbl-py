@@ -57,8 +57,8 @@ class Parser:
         return Block(Range(start, end), lines)
 
     def _expect_stmt(self) -> Stmt:
-
-        types = [TokenType.IDENT, TokenType.NUM, TokenType.CHAR, TokenType.STRING, TokenType.DOT, TokenType.NIL]
+        types = [TokenType.IDENT, TokenType.NUM, TokenType.CHAR, TokenType.STRING, TokenType.DOT, TokenType.NIL,
+                 TokenType.T, TokenType.F]
         if self._can_expect_any(types):
             return self._expect_action()
         elif self._can_expect(TokenType.BR):
@@ -123,9 +123,16 @@ class Parser:
             TokenType.STRING: ItemType.STRING,
             TokenType.CHAR: ItemType.CHAR,
             TokenType.NIL: ItemType.NIL,
+            TokenType.T: ItemType.BOOL,
+            TokenType.F: ItemType.BOOL,
         }
         item = self._next_expect_any(list(type_map.keys()))
-        return Item(item.range, item.payload, type_map[item.type])
+        if item.type is TokenType.T:
+            return Item(item.range, True, type_map[item.type])
+        elif item.type is TokenType.F:
+            return Item(item.range, False, type_map[item.type])
+        else:
+            return Item(item.range, item.payload, type_map[item.type])
 
     def _expect_ident(self) -> str:
         return self._next_expect(TokenType.IDENT).payload
@@ -150,21 +157,21 @@ class Parser:
     def _can_expect(self, ty: TokenType) -> bool:
         return self.curr.type == ty
 
-    def _next_expect_any(self, types: List[TokenType]):
+    def _next_expect_any(self, types: List[TokenType]) -> Token:
         if self.curr.type in types:
             return self._next()
         else:
             raise ParseError(f"expected one of {', '.join(['`' + t.value + '`' for t in types])} token; "
                              f"instead got `{self.curr}` token", self.curr.range, self.source_path)
 
-    def _next_expect(self, ty: TokenType):
+    def _next_expect(self, ty: TokenType) -> Token:
         if self.curr.type == ty:
             return self._next()
         else:
             raise ParseError(f"expected `{ty.value}` token; instead got `{self.curr}` token", self.curr.range,
                              self.source_path)
 
-    def _next(self):
+    def _next(self) -> Token:
         """
         Gets the next token.
         """

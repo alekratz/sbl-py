@@ -7,6 +7,7 @@ class ItemType(Enum):
     IDENT = "identifier"
     CHAR = 'character'
     STRING = 'string'
+    BOOL = 'boolean'
     NIL = 'nil'
 
     def to_val_type(self) -> ValType:
@@ -16,6 +17,7 @@ class ItemType(Enum):
             ItemType.CHAR: ValType.CHAR,
             ItemType.STRING: ValType.STRING,
             ItemType.NIL: ValType.NIL,
+            ItemType.BOOL: ValType.BOOL,
         }
         return mapping[self]
 
