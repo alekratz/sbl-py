@@ -74,6 +74,15 @@ test-stacks {
         a pop println .a;
         a len 0 !=;
     }
+    "I'm going to spell a word!" println;
+    a 's push 'u push 'o push 'u push 'c push 'o push 'n push 'n push 'i push .a;
+    a len 0 !=;
+    loop {
+        .@;
+        a pop print .a;
+        a len 0 !=;
+    }
+    "" println;
 }
 
 main {

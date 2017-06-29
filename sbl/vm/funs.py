@@ -105,6 +105,16 @@ def pop_fn(vm_state):
     vm_state.push(val)
 
 
+def push_fn(vm_state):
+    tos = vm_state.pop()
+    stack = vm_state.pop()
+    if stack.type is not ValType.STACK:
+        raise VMError(f"expected a stack for `push` function; instead got {stack.type}", vm_state.vm,
+                      *vm_state.current_loc())
+    stack.val.append(tos)
+    vm_state.push(stack)
+
+
 def len_fn(vm_state):
     tos = vm_state.pop()
     if tos.type not in [ValType.STACK, ValType.STRING]:
@@ -136,6 +146,7 @@ BUILTINS = {
     '>': greater_than_op,
     # Collection functions
     'pop': pop_fn,
+    'push': push_fn,
     'len': len_fn,
     # Global stack functions
     '$': stack_size_fn,
