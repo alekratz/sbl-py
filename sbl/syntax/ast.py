@@ -3,7 +3,28 @@ from sbl.vm.val import *
 from sbl.syntax.token import TokenType
 
 
+class AST(metaclass=ABCMeta):
+    """
+    The base AST class, which defines the location of the node in a source file, and any lookahead tokens that can be
+    used to match this rule.
+    """
+    def __init__(self, range: Range):
+        self.range = range
+
+    @staticmethod
+    @abstractmethod
+    def lookaheads() -> List[TokenType]:
+        """
+        The list of tokens that act as a "start" for this node.
+        :return:
+        """
+        pass
+
+
 class ItemType(Enum):
+    """
+    An item type. Item types determine the data held by an item - if any.
+    """
     INT = 'integer'
     IDENT = "identifier"
     CHAR = 'character'
@@ -25,17 +46,10 @@ class ItemType(Enum):
         return mapping[self]
 
 
-class AST(metaclass=ABCMeta):
-    def __init__(self, range: Range):
-        self.range = range
-
-    @staticmethod
-    @abstractmethod
-    def lookaheads() -> List[TokenType]:
-        pass
-
-
 class Item(AST):
+    """
+    A literal value or identifier.
+    """
     def __init__(self, rng: Range, val, ty: ItemType):
         super().__init__(rng)
         self.val = val
@@ -75,7 +89,17 @@ class Item(AST):
 
 
 class StackAction(AST):
+    """
+    A singular action on the global stack. This may be a "push" or a "pop" method, and includes an item to push or pop
+    into.
+    """
     def __init__(self, rng: Range, item, pop: bool):
+        """
+        Creates a stack action.
+        :param rng: the location of this stack action in source code.
+        :param item: the item to push to or pop from the global stack.
+        :param pop: determines whether this action is a pop action or not.
+        """
         super().__init__(rng)
         self.item = item
         self.pop = pop
@@ -99,6 +123,10 @@ class StackAction(AST):
 
 class StackStmt(AST):
     def __init__(self, rng: Range, items: List[StackAction]):
+        """
+        :param rng: the location of this statement in source code.
+        :param items: the list of stack actions in this statement.
+        """
         super().__init__(rng)
         self.items = items
 
@@ -120,8 +148,9 @@ class Branch(AST):
     """
     A branch statement. A branch may optionally have a trailing "el" block as
     well.
-    :br: the list of lines held by the br block.
-    :el: the list of lines held by the el block.
+    :param rng: the location of this branch in source code.
+    :param br_block: the list of lines held by the br block.
+    :param el_block: the list of lines held by the el block.
     """
     def __init__(self, rng: Range, br_block: 'Block', el_block: 'Block'):
         super().__init__(rng)
@@ -142,6 +171,11 @@ class Branch(AST):
 
 class Loop(AST):
     def __init__(self, rng: Range, block: 'Block'):
+        """
+        A loop statement. A
+        :param rng:
+        :param block:
+        """
         super().__init__(rng)
         self.block = block
 
@@ -197,6 +231,7 @@ class FunDef(AST):
     def lookaheads() -> List[TokenType]:
         return [TokenType.IDENT]
 
+
 class Import(AST):
     def __init__(self, rng: Range, path: str):
         super().__init__(rng)
@@ -208,6 +243,7 @@ class Import(AST):
     @staticmethod
     def lookaheads() -> List[TokenType]:
         return [TokenType.IMPORT]
+
 
 TopLevel = Union[FunDef, Import]
 Source = List[TopLevel]
