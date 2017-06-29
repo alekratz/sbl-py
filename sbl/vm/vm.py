@@ -1,6 +1,6 @@
-from .compile import *
-from .funs import BUILTINS
-from .val import Val, ValType
+from sbl.vm.compile import *
+from sbl.vm.funs import BUILTINS
+from sbl.vm.val import Val, ValType
 
 
 class VMState:

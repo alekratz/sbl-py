@@ -1,4 +1,5 @@
-from .val import *
+from sbl.vm.val import Val, ValType
+from enum import *
 
 
 class BCType(Enum):

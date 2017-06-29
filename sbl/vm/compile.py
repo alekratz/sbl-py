@@ -1,6 +1,6 @@
 from sbl.syntax.parse import *
-from .bc import *
-from .funs import BUILTINS
+from sbl.vm.bc import *
+from sbl.vm.funs import BUILTINS
 
 
 class Fun:

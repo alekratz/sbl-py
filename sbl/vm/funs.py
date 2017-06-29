@@ -1,5 +1,5 @@
 from sbl.common import *
-from . val import *
+from sbl.vm.val import *
 
 
 def plus_op(vm_state):
