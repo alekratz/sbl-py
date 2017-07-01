@@ -199,7 +199,7 @@ class Tokenizer:
             self._adv()
             end = copy(self.pos)
             c = self.curr_ch
-            if not self._adv_expect(string.ascii_letters + string.digits + syms + '\\'):
+            if not self._adv_expect(string.ascii_letters + string.digits + syms + '\\.'):
                 raise ParseError(f'expected non-whitespace character; instead got {repr(c)}', Range(start, end),
                                  self.source_path)
             if c == '\\':
