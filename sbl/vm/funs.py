@@ -64,7 +64,7 @@ def equals_op(vm_state):
     """
     lhs = vm_state.pop()
     rhs = vm_state.pop()
-    vm_state.push(Val(lhs == rhs, ValType.BOOL))
+    vm_state.push(Val(lhs.val == rhs.val, ValType.BOOL))
 
 
 def nequals_op(vm_state):
@@ -75,7 +75,7 @@ def nequals_op(vm_state):
     """
     lhs = vm_state.pop()
     rhs = vm_state.pop()
-    vm_state.push(Val(lhs != rhs, ValType.BOOL))
+    vm_state.push(Val(lhs.val != rhs.val, ValType.BOOL))
 
 
 def ltequals_op(vm_state):
@@ -86,7 +86,7 @@ def ltequals_op(vm_state):
     """
     rhs = vm_state.pop()
     lhs = vm_state.pop()
-    vm_state.push(Val(lhs <= rhs, ValType.BOOL))
+    vm_state.push(Val(lhs.val <= rhs.val, ValType.BOOL))
 
 
 def gtequals_op(vm_state):
@@ -97,7 +97,7 @@ def gtequals_op(vm_state):
     """
     rhs = vm_state.pop()
     lhs = vm_state.pop()
-    vm_state.push(Val(lhs >= rhs, ValType.BOOL))
+    vm_state.push(Val(lhs.val >= rhs.val, ValType.BOOL))
 
 
 def less_than_op(vm_state):
@@ -108,7 +108,7 @@ def less_than_op(vm_state):
     """
     rhs = vm_state.pop()
     lhs = vm_state.pop()
-    vm_state.push(Val(lhs < rhs, ValType.BOOL))
+    vm_state.push(Val(lhs.val < rhs.val, ValType.BOOL))
 
 
 def greater_than_op(vm_state):
@@ -119,7 +119,7 @@ def greater_than_op(vm_state):
     """
     rhs = vm_state.pop()
     lhs = vm_state.pop()
-    vm_state.push(Val(lhs > rhs, ValType.BOOL))
+    vm_state.push(Val(lhs.val > rhs.val, ValType.BOOL))
 
 
 def print_fn(vm_state):
@@ -208,6 +208,7 @@ def len_fn(vm_state):
     if tos.type not in [ValType.STACK, ValType.STRING]:
         raise VMError(f"expected a stack or string for `len` function; instead got {tos.type}", vm_state.vm,
                       *vm_state.current_loc())
+    vm_state.push(tos)
     vm_state.push(Val(len(tos.val), ValType.INT))
 
 
