@@ -5,8 +5,7 @@ from sbl.syntax.parse import *
 
 class TestParser(TestCase):
     def assert_item(self, item, type: ItemType, val):
-        self.assertEqual(item.type, type)
-        self.assertEqual(item.val, val)
+        self.assertEqual((item.type, item.val), (type, val))
 
     def assert_action(self, action: StackStmt, items: List[Item], pop):
         self.assertEqual(len(action.items), len(items))

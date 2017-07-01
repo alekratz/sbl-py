@@ -5,8 +5,7 @@ from sbl.syntax.token import *
 
 class TestTokens(TestCase):
     def check_token(self, token: Token, type: TokenType, payload: Any=None):
-        self.assertEqual(token.type, type)
-        self.assertEqual(token.payload, payload)
+        self.assertEqual((token.type, token.payload), (type, payload))
 
     def test_comments(self):
         t = Tokenizer("""
