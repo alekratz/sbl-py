@@ -30,6 +30,8 @@ class Val:
     def __str__(self):
         if self.type is ValType.STACK:
             return '[' + str(', '.join(map(str, self.val))) + ']'
+        elif self.type is ValType.BOOL:
+            return "T" if self.val else "F"
         else:
             return str(self.val)
 

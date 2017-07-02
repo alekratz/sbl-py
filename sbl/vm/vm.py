@@ -100,10 +100,11 @@ class VM:
                 fun_state.pc += 1
             elif bc.code == BCType.POP:
                 item = self.state.pop()
-                if bc.val is not None:
+                if bc.val.type is not ValType.NIL:
                     self.state.store(bc.val.val, item)
                 fun_state.pc += 1
             elif bc.code == BCType.POPN:
+                assert bc.val.type is ValType.INT
                 if len(self.state.stack) < bc.val.val:
                     raise VMError(f"attempted to pop {bc.val.val} items off of a stack with only {len(self.state.stack)}"
                                   "items", self, bc.meta['file'], bc.meta['where'])

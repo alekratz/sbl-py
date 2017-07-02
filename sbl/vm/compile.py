@@ -119,8 +119,11 @@ class Compiler:
             if action.pop:
                 meta = self._meta_with(where=item.range)
                 assert item.type in [ItemType.IDENT, ItemType.NIL, ItemType.INT], \
-                    f'item type for pop StackAction was not ident, nil, or int: {stmt.item.type}'
-                bc += [BC.pop(meta, item.to_val())]
+                    f'item type for pop StackAction was not ident, nil, or int: {item.type}'
+                if item.type is ItemType.INT:
+                    bc += [BC.popn(meta, item.to_val())]
+                else:
+                    bc += [BC.pop(meta, item.to_val())]
             else:
                 bc += self._compile_item_push(item)
         return bc
