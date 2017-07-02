@@ -72,6 +72,7 @@ Or, "room for improvement"
 * Lightning-fast virtual machine and compiler implemented in Python
 * No savable bytecode (see [#11](../../issues/11))
 * No base or standard library (see [#9](/issues/9))
+* No FFI
 
 # Planned features
 ## [0.2.0 roadmap](https://github.com/alekratz/sbl/milestone/1)
