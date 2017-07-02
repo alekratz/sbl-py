@@ -4,7 +4,7 @@ from enum import *
 
 from sbl.common import *
 
-syms = "!@$%^&*-+/="
+syms = "!@$%^&*-+/=<>"
 escape_map = {
     'n': '\n',
     't': '\t',
@@ -15,6 +15,7 @@ escape_map = {
     "'": "'",
     '\\': '\\',
 }
+
 
 class TokenType(Enum):
     COMMENT = 'comment'
@@ -199,10 +200,12 @@ class Tokenizer:
             self._adv()
             end = copy(self.pos)
             c = self.curr_ch
-            if not self._adv_expect(string.ascii_letters + string.digits + syms + '\\.'):
-                raise ParseError(f'expected non-whitespace character; instead got {repr(c)}', Range(start, end),
+            if self.curr_ch in (set(escape_map.values()) - {'\\'}):
+                raise ParseError(f'expected character value; instead got {repr(c)}', Range(start, end),
                                  self.source_path)
+            self._adv()
             if c == '\\':
+
                 c = self.curr_ch
                 # escapes
                 if c not in escape_map:
