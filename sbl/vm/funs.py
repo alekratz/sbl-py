@@ -42,6 +42,18 @@ def minus_op(vm_state):
     vm_state.push(Val(lhs.val - rhs.val, lhs.type))
 
 
+def unary_minus_op(vm_state):
+    """
+    The `u-` op.
+    :param vm_state: the VM state.
+    """
+    item = vm_state.pop()
+    if item.type is not ValType.INT:
+        raise VMError(f"{item.type} is not compatible with the unary negative function `u-`", vm_state.vm,
+                      *vm_state.current_loc())
+    vm_state.push(Val(-item.val, item.type))
+
+
 def div_op(vm_state):
     """
     The `/` op.
