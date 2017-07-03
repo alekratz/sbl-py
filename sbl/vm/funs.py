@@ -238,6 +238,7 @@ BUILTINS = {
     '+': plus_op,
     '*': times_op,
     '-': minus_op,
+    'u-': unary_minus_op,
     '/': div_op,
     # Comparison functions
     '==': equals_op,

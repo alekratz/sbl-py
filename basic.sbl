@@ -10,7 +10,3 @@ rep {
     .n;
 }
 
-# Finds -N
-ng {
-    .x 0 x -;
-}

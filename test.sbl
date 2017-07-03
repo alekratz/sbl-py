@@ -42,7 +42,7 @@ test-printing {
 }
 
 test-booleans {
-    5 ng ^ .l .r;
+    5 u- ^ .l .r;
     l r ==;
     br {
         l print " == " print r println;
