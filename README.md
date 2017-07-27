@@ -1,3 +1,8 @@
+# PLEASE NOTE: THIS REPOSITORY EXISTS FOR HISTORICAL/REFERENCE REASONS ONLY
+It still runs and tests probably still pass, but I'm not updating it anymore.
+
+If you want to run SBL, you should check out the Rust implementation, [sbl-rs](alekratz/sbl-rs).
+
 # SBL - Stack Based Language
 Original name, right?
 
